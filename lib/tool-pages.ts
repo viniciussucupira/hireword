@@ -26,14 +26,14 @@ const PRICE_LINE = "$19/month, with one free rewrite a day to try it first.";
 
 export const TOOL_PAGES: Record<string, ToolPage> = {
   /* ------------------------------------------------------------------ */
-  "cover-letter-for-non-native-speakers": {
-    slug: "cover-letter-for-non-native-speakers",
+  "cover-letter-rewriter": {
+    slug: "cover-letter-rewriter",
     context: "cover-letter",
-    metaTitle: "Cover Letter Rewriter for Non-Native English Speakers | Hireword",
+    metaTitle: "Cover Letter Rewriter | Hireword",
     metaDescription:
-      "Rewrite your cover letter into the English a hiring manager expects — warm, confident, and free of translated phrasing. " +
+      "Rewrite your cover letter into the English a hiring manager expects — warm, confident, and free of awkward phrasing. " +
       PRICE_LINE,
-    ogTitle: "Cover Letter Rewriter for Non-Native English Speakers",
+    ogTitle: "Cover Letter Rewriter",
     ogDescription:
       "Improve your cover letter's English, compare it with your original, and make final edits. One free rewrite a day; Pro is US$19/month.",
     eyebrow: "Cover letter rewriter",
@@ -46,12 +46,12 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       "Dear Hiring Manager,\n\nI am writing for apply to the position of Product Designer that I saw announced in your website. I have 5 years of experience in design of mobile applications…",
     benefits: [
       {
-        title: "Opens the way a native would open",
-        body: "“I am writing for apply to the position of…” becomes “I'm writing to apply for the…” — the small preposition slips that mark a letter as translated.",
+        title: "Opens the way a strong letter opens",
+        body: "“I am writing for apply to the position of…” becomes “I'm writing to apply for the…” — the small preposition slips a hiring manager notices in the first line.",
       },
       {
         title: "Confident without sounding arrogant",
-        body: "Keeps the modest register most non-native drafts aim for, while removing the apologetic phrasing that undersells you.",
+        body: "Keeps a modest, professional register while removing the apologetic phrasing that undersells you.",
       },
       {
         title: "Your experience, ready for review",
@@ -85,11 +85,11 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
     faq: [
       {
         q: "Should I write the cover letter in my own language first?",
-        a: "Write it in English, in whatever English you have. Hireword works from your own sentences, so the result still sounds like you. Translating a polished letter from another language usually produces phrasing that is harder to repair, not easier.",
+        a: "Write it in English, in your own words. Hireword works from your own sentences, so the result still sounds like you.",
       },
       {
         q: "Will it make my cover letter longer?",
-        a: "Usually shorter. Natural professional English is more direct than a literal translation, so padding and repetition tend to disappear while the content stays.",
+        a: "Usually shorter. Clear professional English is direct, so padding and repetition tend to disappear while the content stays.",
       },
       {
         q: "Can I rewrite the whole letter at once?",
@@ -103,19 +103,19 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
     related: [
       { href: "/job-application-letter-rewriter", label: "Job application letter rewriter" },
       { href: "/visa-sponsorship-cover-letter", label: "Visa sponsorship cover letter" },
-      { href: "/native-sounding-resume", label: "Resume rewriter" },
+      { href: "/resume-rewriter", label: "Resume rewriter" },
     ],
   },
 
   /* ------------------------------------------------------------------ */
-  "native-sounding-resume": {
-    slug: "native-sounding-resume",
+  "resume-rewriter": {
+    slug: "resume-rewriter",
     context: "resume-bullet",
-    metaTitle: "Resume Rewriter — Make Your Resume Sound Native | Hireword",
+    metaTitle: "Resume Rewriter — Clear, Concise Resume Bullets | Hireword",
     metaDescription:
       "Rewrite your resume bullet points into concise professional English, with a built-in number comparison and editable results. " +
       PRICE_LINE,
-    ogTitle: "Make Your Resume Sound Native",
+    ogTitle: "Clear, Concise Resume Bullets",
     ogDescription:
       "Make resume bullets concise and natural, with a built-in number comparison. One free rewrite a day; Pro is US$19/month.",
     eyebrow: "Resume rewriter",
@@ -129,7 +129,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
     benefits: [
       {
         title: "Clear action verbs",
-        body: "“Was responsible for the management of” becomes “Managed”. One word instead of six, and it reads like a native resume.",
+        body: "“Was responsible for the management of” becomes “Managed”. One word instead of six, and it reads like a strong resume.",
       },
       {
         title: "Filler removed, metrics kept",
@@ -186,7 +186,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
     related: [
       { href: "/ats-friendly-resume-bullet-points", label: "ATS-friendly resume bullet points" },
       { href: "/cv-english-rewriter", label: "CV rewriter for UK and Europe" },
-      { href: "/cover-letter-for-non-native-speakers", label: "Cover letter rewriter" },
+      { href: "/cover-letter-rewriter", label: "Cover letter rewriter" },
     ],
   },
 
@@ -200,7 +200,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       PRICE_LINE,
     ogTitle: "CV English Rewriter",
     ogDescription:
-      "Paste your CV bullets and get them back clear, concise, and native-sounding for UK and EU applications. $19/month.",
+      "Paste your CV bullets and get them back clear, concise, and professional for UK and EU applications. $19/month.",
     eyebrow: "CV rewriter",
     headingLead: "A CV that reads as",
     headingAccent: "understated and precise",
@@ -216,7 +216,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       },
       {
         title: "False friends corrected",
-        body: "“Realised the coordination”, “obtained a reduction”, “formation of colleagues” — the literal translations that give a CV away, replaced with the English equivalent.",
+        body: "“Realised the coordination”, “obtained a reduction”, “formation of colleagues” — the wordy constructions that weaken a CV, replaced with the direct English equivalent.",
       },
       {
         title: "Consistent, scannable lines",
@@ -266,9 +266,9 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       },
     ],
     related: [
-      { href: "/native-sounding-resume", label: "Resume rewriter for US applications" },
+      { href: "/resume-rewriter", label: "Resume rewriter for US applications" },
       { href: "/ats-friendly-resume-bullet-points", label: "ATS-friendly resume bullet points" },
-      { href: "/cover-letter-for-non-native-speakers", label: "Cover letter rewriter" },
+      { href: "/cover-letter-rewriter", label: "Cover letter rewriter" },
     ],
   },
 
@@ -349,9 +349,9 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       },
     ],
     related: [
-      { href: "/native-sounding-resume", label: "Resume rewriter" },
+      { href: "/resume-rewriter", label: "Resume rewriter" },
       { href: "/cv-english-rewriter", label: "CV rewriter for UK and Europe" },
-      { href: "/cover-letter-for-non-native-speakers", label: "Cover letter rewriter" },
+      { href: "/cover-letter-rewriter", label: "Cover letter rewriter" },
     ],
   },
 
@@ -433,7 +433,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
     related: [
       { href: "/linkedin-connection-message-rewriter", label: "LinkedIn connection message rewriter" },
       { href: "/interview-follow-up-email-generator", label: "Interview follow-up email" },
-      { href: "/cover-letter-for-non-native-speakers", label: "Cover letter rewriter" },
+      { href: "/cover-letter-rewriter", label: "Cover letter rewriter" },
     ],
   },
 
@@ -516,7 +516,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
     related: [
       { href: "/recruiter-message-rewriter", label: "Recruiter message rewriter" },
       { href: "/interview-follow-up-email-generator", label: "Interview follow-up email" },
-      { href: "/native-sounding-resume", label: "Resume rewriter" },
+      { href: "/resume-rewriter", label: "Resume rewriter" },
     ],
   },
 
@@ -584,7 +584,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       },
       {
         q: "Is it rude to ask about the decision?",
-        a: "Not if you ask once and phrase it as an offer to wait. The rewrite keeps that balance, which is exactly where non-native drafts tend to slip.",
+        a: "Not if you ask once and phrase it as an offer to wait. The rewrite keeps that balance, which is exactly where many drafts slip.",
       },
       {
         q: "Should I write to each interviewer separately?",
@@ -598,7 +598,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
     related: [
       { href: "/recruiter-message-rewriter", label: "Recruiter message rewriter" },
       { href: "/linkedin-connection-message-rewriter", label: "LinkedIn connection message rewriter" },
-      { href: "/cover-letter-for-non-native-speakers", label: "Cover letter rewriter" },
+      { href: "/cover-letter-rewriter", label: "Cover letter rewriter" },
     ],
   },
 
@@ -627,8 +627,8 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
         body: "Long sentences are split, the order of ideas is corrected, and the letter arrives in the shape an English reader expects.",
       },
       {
-        title: "Removes the translated openings",
-        body: "“I would like to present my candidature” and “I have worked during 7 years” are the two phrases that mark a letter as translated. Both go.",
+        title: "Removes the stiff openings",
+        body: "“I would like to present my candidature” and “I have worked during 7 years” are the kind of stiff phrasing that weakens a letter. Both go.",
       },
       {
         title: "Your experience remains the starting point",
@@ -666,7 +666,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       },
       {
         q: "Can I paste a letter that is already in English?",
-        a: "That is exactly the case this is built for. It does not translate; it takes English that is correct but slightly off and makes it natural.",
+        a: "That is exactly the case this is built for. It does not translate; it takes the English you wrote and makes it clearer and more natural.",
       },
       {
         q: "Will it keep the name of the company?",
@@ -678,7 +678,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       },
     ],
     related: [
-      { href: "/cover-letter-for-non-native-speakers", label: "Cover letter rewriter" },
+      { href: "/cover-letter-rewriter", label: "Cover letter rewriter" },
       { href: "/visa-sponsorship-cover-letter", label: "Visa sponsorship cover letter" },
       { href: "/cv-english-rewriter", label: "CV rewriter" },
     ],
@@ -706,7 +706,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
     benefits: [
       {
         title: "Direct about sponsorship, never apologetic",
-        body: "The rewrite states your requirement as a fact, the way a native applicant would state a notice period — no hedging, no over-explaining.",
+        body: "The rewrite states your requirement as a fact, the way an experienced applicant would state a notice period — no hedging, no over-explaining.",
       },
       {
         title: "Fixes the false friends that matter here",
@@ -761,7 +761,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       },
     ],
     related: [
-      { href: "/cover-letter-for-non-native-speakers", label: "Cover letter rewriter" },
+      { href: "/cover-letter-rewriter", label: "Cover letter rewriter" },
       { href: "/job-application-letter-rewriter", label: "Job application letter rewriter" },
       { href: "/cv-english-rewriter", label: "CV rewriter" },
     ],

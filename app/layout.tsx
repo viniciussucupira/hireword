@@ -15,11 +15,11 @@ const SITE_URL = "https://hireword.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Hireword — Sound Native in Your Job Application",
+  title: "Hireword — Cover Letters and Resumes That Read Clear and Confident",
   description:
     "Rewrite your cover letter, resume bullets, and recruiter messages in clear, natural English. Try one rewrite a day free. Pro is $19/month.",
   openGraph: {
-    title: "Hireword — Sound Native in Your Job Application",
+    title: "Hireword — Cover Letters and Resumes That Read Clear and Confident",
     description:
       "Polish your cover letter, resume, or LinkedIn message in American or British English. Try one rewrite a day free, no email or card. Pro is $19/month.",
     url: SITE_URL,
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Hireword — Sound Native in Your Job Application",
+    title: "Hireword — Cover Letters and Resumes That Read Clear and Confident",
     description:
       "Polish your cover letter, resume, or LinkedIn message in American or British English. Try one rewrite a day free, no email or card. Pro is $19/month.",
   },

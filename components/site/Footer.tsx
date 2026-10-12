@@ -12,9 +12,9 @@ const EXPLORE = [
   ["/#examples", "Before & after"],
 ];
 const WRITING = [
-  ["/cover-letter-for-non-native-speakers", "Cover letters"],
+  ["/cover-letter-rewriter", "Cover letters"],
   ["/recruiter-message-rewriter", "Recruiter messages"],
-  ["/native-sounding-resume", "Resume bullets"],
+  ["/resume-rewriter", "Resume bullets"],
   ["/linkedin-connection-message-rewriter", "LinkedIn messages"],
   ["/cv-english-rewriter", "CV writing"],
   ["/interview-follow-up-email-generator", "Interview follow-ups"],

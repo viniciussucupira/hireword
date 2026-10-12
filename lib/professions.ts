@@ -4,7 +4,7 @@ export type Profession = {
   singular: string;
   /** Typical job title used in the page examples. */
   role: string;
-  /** A duty written the way a non-native draft tends to phrase it. */
+  /** A duty written the way a first draft tends to phrase it. */
   duty: string;
   /** The same duty in natural professional English. Same facts, same numbers. */
   dutyNatural: string;

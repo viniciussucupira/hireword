@@ -35,7 +35,7 @@ const USE_CASES = [
     Icon: IconCoverLetter,
     title: "Cover letters",
     body: "The opening paragraph that decides whether a hiring manager keeps reading.",
-    href: "/cover-letter-for-non-native-speakers",
+    href: "/cover-letter-rewriter",
     tint: "bg-brand-50 text-brand",
     hover: "hover:border-brand-300 hover:bg-brand-50/40",
     link: "text-brand-700",
@@ -44,7 +44,7 @@ const USE_CASES = [
     Icon: IconResumeBullets,
     title: "Resume and CV bullets",
     body: "Make your experience concise and easy to read, then compare the numbers with your original.",
-    href: "/native-sounding-resume",
+    href: "/resume-rewriter",
     tint: "bg-jade-50 text-jade",
     hover: "hover:border-jade-100 hover:bg-jade-50/40",
     link: "text-jade",
@@ -277,7 +277,7 @@ export default function Home() {
                 <ul className="mt-1 flex flex-col gap-3">
                   {[
                     "Grammar, articles, and prepositions corrected",
-                    "Translated-sounding phrasing replaced with natural wording",
+                    "Awkward phrasing replaced with clear, natural wording",
                     "Tone matched to the document — a cover letter is not a LinkedIn note",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-[0.9375rem] leading-6 text-ink">

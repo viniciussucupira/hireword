@@ -150,8 +150,8 @@ export function professionBenefits(doc: DocType, p: Profession): { title: string
     case "cover-letter":
       return [
         {
-          title: "Opens the way a native opens",
-          body: "The preposition slips that mark a letter as translated — “writing for apply”, “interest for work” — are corrected in the first line, where they cost the most.",
+          title: "Opens the way a strong letter opens",
+          body: "Preposition slips like “writing for apply” or “interest for work” are corrected in the first line, where they cost the most.",
         },
         {
           title: `Vocabulary that fits ${p.label.toLowerCase()}`,
@@ -206,7 +206,7 @@ export function professionFaq(doc: DocType, p: Profession): FaqItem[] {
   return [
     {
       q: `What makes ${doc.label} sound natural for ${p.label.toLowerCase()}?`,
-      a: `It uses the vocabulary and tone hiring managers expect in your field, replaces phrasing translated word for word from another language, and keeps sentences short and direct — the way ${p.singular} working in English would write it.`,
+      a: `It uses the vocabulary and tone hiring managers expect in your field, replaces wordy or awkward phrasing, and keeps sentences short and direct — the way ${p.singular} working in English would write it.`,
     },
     {
       q: `Will it change the facts in my ${doc.label}?`,

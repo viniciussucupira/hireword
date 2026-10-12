@@ -75,7 +75,7 @@ export default function HeroDemo() {
               {revealed ? (
                 <>
                   <IconCheck className="h-3.5 w-3.5" />
-                  Rewritten in native English
+                  Rewritten
                 </>
               ) : (
                 <>
@@ -97,7 +97,7 @@ export default function HeroDemo() {
           >
             <div className="flex items-center justify-between gap-3">
               <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-brand-700">
-                Native English
+                Rewritten
               </p>
               <span className="inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold text-success">
                 <IconFacts className="h-3.5 w-3.5" />

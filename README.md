@@ -1,8 +1,8 @@
 # Hireword
 
 AI tool that rewrites cover letters, resume bullet points, and recruiter
-messages so they sound like a native English speaker wrote them — built for
-non-native professionals applying for jobs in the US, UK, Canada, and Europe.
+messages so they read clear, confident, and professional — built for
+professionals applying for jobs in the US, UK, Canada, and Europe.
 
 Same architecture as Fluentsmith: Next.js (App Router) + Tailwind, freemium
 rate-limited by IP via the same Upstash Redis instance, Pro unlocked through
@@ -11,8 +11,8 @@ Paddle (Merchant of Record) with a webhook, deployed on Vercel.
 ## Pages
 
 - `/` — main tool (cover letter by default)
-- `/cover-letter-for-non-native-speakers`
-- `/native-sounding-resume`
+- `/cover-letter-rewriter`
+- `/resume-rewriter`
 - `/recruiter-message-rewriter`
 - `/checkout` — Paddle checkout (Monthly $19; the Lifetime plan is no longer sold)
 - `/login` — log in with a one-time email link, sign out, or sign out on all devices (`/restore` redirects here, keeping `?txn=`)

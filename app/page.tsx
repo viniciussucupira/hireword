@@ -12,7 +12,7 @@ const jsonLd = {
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description:
-    "AI tool that rewrites cover letters, resume bullet points, and recruiter messages so they sound like a native English speaker wrote them.",
+    "AI tool that rewrites cover letters, resume bullet points, and recruiter messages so they read clear, confident, and professional.",
   offers: [
     { "@type": "Offer", price: "19", priceCurrency: "USD", name: "Monthly" },
   ],

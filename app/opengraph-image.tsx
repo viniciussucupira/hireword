@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Hireword — job applications that read like native English";
+export const alt = "Hireword — job applications that read clear and confident";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -90,7 +90,7 @@ export default function Image() {
                 letterSpacing: -2,
               }}
             >
-              Job applications that read like native English
+              Job applications that read clear and confident
             </div>
             <div style={{ fontSize: 27, color: "#667085", lineHeight: 1.4 }}>
               Clearer cover letters, resume bullets and recruiter messages. Review, edit, and make them yours.
@@ -175,7 +175,7 @@ export default function Image() {
             }}
           >
             <div style={{ fontSize: 17, fontWeight: 700, color: "#1D4FB8", letterSpacing: 2, display: "flex" }}>
-              NATIVE ENGLISH
+              REWRITTEN
             </div>
             <div style={{ fontSize: 24, color: "#18202B", lineHeight: 1.5, display: "flex" }}>
               I&apos;m writing to apply for the Financial Analyst position listed on your site.
