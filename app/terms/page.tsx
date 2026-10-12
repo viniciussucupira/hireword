@@ -114,7 +114,7 @@ export default function TermsPage() {
       updated="September 25, 2026"
       intro={
         <>
-          Hireword is a product operated by Solrenning (&quot;we&quot;, &quot;us&quot;). By using hireword.com
+          Hireword is a product operated by Vinicius Colares Sucupira, an individual trading as Solrenning (&quot;we&quot;, &quot;us&quot;). By using hireword.com
           (the &quot;Service&quot;), you agree to these Terms.
         </>
       }
