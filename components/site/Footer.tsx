@@ -73,7 +73,7 @@ export default function Footer() {
         </div>
         <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs leading-6 text-muted">Payments processed by Paddle, our merchant of record.</p>
-          <a href="https://turbo0.com/item/nativeapply" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center">
+          <a href="https://turbo0.com/item/hireword" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center">
             {/* Turbo0's own badge, as its free listing asks; a remote SVG, so next/image adds nothing. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" width={98} height={32} style={{ height: 32, width: "auto" }} loading="lazy" />
