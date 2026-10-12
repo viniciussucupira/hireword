@@ -35,7 +35,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       PRICE_LINE,
     ogTitle: "Cover Letter Rewriter",
     ogDescription:
-      "Improve your cover letter's English, compare it with your original, and make final edits. One free rewrite a day; Pro is US$19/month.",
+      "Improve your cover letter's English, compare it with your original, and make final edits. Pro is US$19/month; try one free rewrite a day.",
     eyebrow: "Cover letter rewriter",
     headingLead: "Your experience, expressed in",
     headingAccent: "clear, confident English",
@@ -117,7 +117,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       PRICE_LINE,
     ogTitle: "Clear, Concise Resume Bullets",
     ogDescription:
-      "Make resume bullets concise and natural, with a built-in number comparison. One free rewrite a day; Pro is US$19/month.",
+      "Make resume bullets concise and natural, with a built-in number comparison. Pro is US$19/month; try one free rewrite a day.",
     eyebrow: "Resume rewriter",
     headingLead: "Resume bullets that sound",
     headingAccent: "clear, concise, and professional",

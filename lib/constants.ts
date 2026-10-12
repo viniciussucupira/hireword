@@ -8,7 +8,7 @@ export const PRO_BURST_LIMIT = 20;
 export const PRO_BURST_SECONDS = 60;
 
 export const FREE_LIMIT_MESSAGE =
-    "Today's free rewrite in this browser has been used. Try again after midnight UTC, or get Pro for 600 rewrites a month.";
+    "Today's free rewrite in this browser has been used. Try again after midnight UTC, or get Pro to keep going.";
 
 export const CONTEXT_TYPES = [
   {

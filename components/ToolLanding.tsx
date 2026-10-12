@@ -75,7 +75,7 @@ export default function ToolLanding({ page }: { page: ToolPage }) {
               </ButtonLink>
             </div>
             <p className="text-[0.875rem] text-muted">
-              One free rewrite a day. No email or card. Pro is 600 rewrites a month for $19, cancel anytime.
+              Hireword Pro is $19 a month, cancel anytime. Try one rewrite a day free, with no email or card.
             </p>
           </div>
         </Container>

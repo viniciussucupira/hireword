@@ -17,7 +17,9 @@ import {
 } from "@/components/ui/Icons";
 import { useProStatus } from "@/components/ui/useProStatus";
 import { textSharing } from "@/lib/text-sharing";
-import { PRO_MONTHLY_REWRITES } from "@/lib/allowance";
+
+/** The reminder appears once a fifth of the month's allowance or less is left. */
+const LOW_ALLOWANCE_SHARE = 0.2;
 
 type Allowance = { remaining: number; limit: number };
 
@@ -220,7 +222,7 @@ export default function Rewriter({
         <div className="mb-5 flex items-start gap-3 rounded-2xl border border-success/25 bg-success-50 p-4 text-[0.9375rem] text-navy">
           <IconCheck className="mt-0.5 h-5 w-5 shrink-0 text-success" />
           <p>
-            Pro is active in this browser. It includes {PRO_MONTHLY_REWRITES} rewrites a month.
+            Pro is active in this browser.
           </p>
         </div>
       )}
@@ -234,13 +236,17 @@ export default function Rewriter({
             </p>
             {isPro && (
               <Pill tone="success">
-                <IconCheck className="h-3.5 w-3.5" />
-                <span aria-live="polite" aria-atomic="true">
-                  {allowance
-                    ? `Pro · ${allowance.remaining.toLocaleString("en-US")} of ${allowance.limit.toLocaleString("en-US")} rewrites left this month`
-                    : "Pro"}
-                </span>
+                <IconCheck className="h-3.5 w-3.5" /> Pro
               </Pill>
+            )}
+          </div>
+          {/* A calm reminder only near the end of the month's allowance; the figure itself lives in the FAQ and the Terms. */}
+          <div aria-live="polite" aria-atomic="true">
+            {isPro && allowance && allowance.remaining <= allowance.limit * LOW_ALLOWANCE_SHARE && (
+              <p className="mt-3 rounded-xl border border-brand-100 bg-white/70 px-3.5 py-2 text-[0.8125rem] leading-5 text-muted">
+                {allowance.remaining === 1 ? "1 rewrite" : `${allowance.remaining.toLocaleString("en-US")} rewrites`} left this month.
+                The allowance renews on the 1st (UTC).
+              </p>
             )}
           </div>
 
@@ -536,7 +542,7 @@ export default function Rewriter({
         {!isPro && (
           <div className="flex flex-col items-center gap-1 border-t border-line bg-white px-4 py-4 text-center sm:flex-row sm:justify-center sm:gap-2 sm:py-3.5">
             <p className="text-[0.875rem] text-muted">
-              Pro: {PRO_MONTHLY_REWRITES} rewrites a month for <span className="font-semibold text-navy">$19</span>, cancel anytime.
+              Hireword Pro: <span className="font-semibold text-navy">$19/month</span>, cancel anytime.
             </p>
             <Link
               href="/checkout"

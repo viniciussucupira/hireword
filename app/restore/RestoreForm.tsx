@@ -152,7 +152,7 @@ export default function LoginForm({ emailEnabled = false }: { emailEnabled?: boo
                     Pro is active in this browser
                   </p>
                   <p className="mt-2 text-[0.9375rem] leading-6 text-muted">
-                    600 rewrites a month, starting now. Nothing else to set up.
+                    You can rewrite right away. Nothing else to set up.
                   </p>
                   <ButtonLink href="/#tool" className="mt-5">
                     Start rewriting

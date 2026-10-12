@@ -2,7 +2,7 @@ import { ButtonLink, Container } from "@/components/ui/Primitives";
 
 export default function FinalCta({
   title = "Send the version that sounds like you at your best.",
-  body = "Paste your draft, read the rewrite, and decide for yourself. Pro is 600 rewrites a month for $19, cancel anytime. One free rewrite a day to start.",
+  body = "Paste your draft, read the rewrite, and decide for yourself. Hireword Pro is $19 a month, cancel anytime. One free rewrite a day to start.",
   href = "/#tool",
   cta = "Rewrite my text",
 }: {

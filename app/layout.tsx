@@ -17,11 +17,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Hireword — Cover Letters and Resumes That Read Clear and Confident",
   description:
-    "Rewrite your cover letter, resume bullets, and recruiter messages in clear, natural English. Try one rewrite a day free. Pro is $19/month.",
+    "Rewrite your cover letter, resume bullets, and recruiter messages in clear, natural English. Pro is $19/month; try one rewrite a day free.",
   openGraph: {
     title: "Hireword — Cover Letters and Resumes That Read Clear and Confident",
     description:
-      "Polish your cover letter, resume, or LinkedIn message in American or British English. Try one rewrite a day free, no email or card. Pro is $19/month.",
+      "Polish your cover letter, resume, or LinkedIn message in American or British English. Pro is $19/month; try one rewrite a day free, no email or card.",
     url: SITE_URL,
     siteName: "Hireword",
     type: "website",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Hireword — Cover Letters and Resumes That Read Clear and Confident",
     description:
-      "Polish your cover letter, resume, or LinkedIn message in American or British English. Try one rewrite a day free, no email or card. Pro is $19/month.",
+      "Polish your cover letter, resume, or LinkedIn message in American or British English. Pro is $19/month; try one rewrite a day free, no email or card.",
   },
   verification: {
     google: "PPtQILt6oZAUpSMtxJiEetgcxi5jLKAXjkpSLPreuk0",
