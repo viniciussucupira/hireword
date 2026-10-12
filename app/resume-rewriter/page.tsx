@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import ToolLanding from "@/components/ToolLanding";
 import { getToolPage } from "@/lib/tool-pages";
 
-const page = getToolPage("native-sounding-resume");
+const page = getToolPage("resume-rewriter");
 
 export const metadata: Metadata = {
   title: page.metaTitle,

@@ -33,7 +33,7 @@ function LaptopScreen() {
             </div>
             <div className="flex flex-col gap-2 rounded-lg border border-brand-100 bg-brand-50/50 p-3">
               <span className="text-[0.5625rem] font-semibold uppercase tracking-[0.14em] text-brand-700">
-                Native English
+                Rewritten
               </span>
               <Line w="96%" tone="brand" />
               <Line w="82%" tone="brand" />

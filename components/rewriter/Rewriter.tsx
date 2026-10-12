@@ -354,7 +354,7 @@ export default function Rewriter({
           {/* ---------- result ---------- */}
           <div className="flex flex-col bg-ivory/50 p-4 sm:p-6">
             <div className="flex items-baseline justify-between gap-3">
-              <h3 className="text-sm font-semibold text-navy">Native English</h3>
+              <h3 className="text-sm font-semibold text-navy">Rewritten</h3>
               {phase === "done" && (
                 <span className="text-xs tabular-nums text-muted-soft">
                   {result.length.toLocaleString("en-US")} characters

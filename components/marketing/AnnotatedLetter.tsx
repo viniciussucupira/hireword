@@ -11,13 +11,13 @@ const LAYERS: Layer[] = [
   {
     n: 1,
     label: "Grammar and articles",
-    note: "The slips that mark a sentence as translated, corrected first.",
+    note: "The small slips a reader notices first, corrected first.",
     tone: "brand",
   },
   {
     n: 2,
     label: "Natural phrasing",
-    note: "Word-for-word constructions replaced with what a native writer would say.",
+    note: "Awkward constructions replaced with what an experienced professional would write.",
     tone: "brand",
   },
   {

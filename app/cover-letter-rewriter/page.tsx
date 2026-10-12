@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import ToolLanding from "@/components/ToolLanding";
 import { getToolPage } from "@/lib/tool-pages";
 
-const page = getToolPage("cover-letter-for-non-native-speakers");
+const page = getToolPage("cover-letter-rewriter");
 
 export const metadata: Metadata = {
   title: page.metaTitle,

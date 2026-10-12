@@ -23,8 +23,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: SITE_URL, lastModified: now, priority: 1.0 },
-    { url: `${SITE_URL}/cover-letter-for-non-native-speakers`, lastModified: now, priority: 0.8 },
-    { url: `${SITE_URL}/native-sounding-resume`, lastModified: now, priority: 0.8 },
+    { url: `${SITE_URL}/cover-letter-rewriter`, lastModified: now, priority: 0.8 },
+    { url: `${SITE_URL}/resume-rewriter`, lastModified: now, priority: 0.8 },
     { url: `${SITE_URL}/recruiter-message-rewriter`, lastModified: now, priority: 0.8 },
     { url: `${SITE_URL}/visa-sponsorship-cover-letter`, lastModified: now, priority: 0.7 },
     { url: `${SITE_URL}/job-application-letter-rewriter`, lastModified: now, priority: 0.7 },

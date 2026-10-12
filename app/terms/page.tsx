@@ -15,7 +15,7 @@ const sections: LegalSection[] = [
     body: (
       <p>
         Hireword rewrites text you submit — such as cover letters, resume bullet points, and messages to
-        recruiters — using artificial intelligence, so it reads more naturally to a native English speaker. Without a
+        recruiters — using artificial intelligence, so it reads more clearly and professionally. Without a
         paid plan, use is limited to one rewrite per browser per day, resetting at midnight UTC. Failed generations
         do not use this allowance. Hireword Pro removes the daily limit. Each request supports up to 6,000 characters,
         including spaces and line breaks. Some symbols, such as emoji, count as more than one character in the editor.

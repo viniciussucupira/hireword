@@ -140,7 +140,7 @@ export default function ProfessionPage({
         <Container size="wide" className="py-16 sm:py-20">
           <SectionHeading
             eyebrow="Before and after"
-            title="The same content, in native English"
+            title="The same content, written more clearly"
             description="An illustrative example for this role. Highlighted phrases show the edits. Your result will depend on your draft."
           />
           <div className="mt-10">
