@@ -15,10 +15,10 @@ const sections: LegalSection[] = [
     body: (
       <>
         <p>
-          Every Pro payment, including the initial payment and each monthly renewal, is fully refundable for 14 days. Request within 14 days of the charge for a full refund, no questions asked and no reason needed.
+          Your first Pro payment is fully refundable for 14 days: request it within 14 days of that charge for a full refund, no questions asked and no reason needed. Renewals are not refundable, except where the law of your country requires a refund, or where a fault on our side kept Pro from working and we could not fix it, in which case we refund the period it affected.
         </p>
         <p>
-          You can cancel at any time. Cancellation stops future renewals and keeps the remaining paid period unless refunded. Request a refund of your latest payment directly on this site; the confirmation also stops renewal. For another eligible payment, use <a href="https://paddle.net/contact">Paddle payment help</a>. You do not need to email Hireword. This policy does not limit your statutory rights.
+          You can cancel at any time. Cancellation stops future renewals and keeps the remaining paid period, which is refunded only under the rule above. Request your first-payment refund directly on this site; the confirmation also stops renewal. For a payment the law or a fault on our side makes refundable, use <a href="https://paddle.net/contact">Paddle payment help</a>. You do not need to email Hireword. This policy does not limit your statutory rights.
         </p>
       </>
     ),
@@ -50,7 +50,7 @@ const sections: LegalSection[] = [
       <>
         <ol className="list-decimal space-y-2 pl-5">
           <li>Open <a href="/subscription#refund">Request a refund</a> and verify your purchase email using the secure link we send automatically.</li>
-          <li>Review the latest payment shown, choose Request a refund, and confirm the refund and cancellation of future renewals.</li>
+          <li>Review the first payment shown, choose Request a refund, and confirm the refund and cancellation of future renewals.</li>
           <li>We submit eligible requests directly to Paddle. Check the status on the same page. A request awaiting approval is not yet an approved refund.</li>
         </ol>
         <p>No support email or explanation is needed for an eligible payment request. Paddle may require
@@ -78,7 +78,7 @@ export default function RefundsPage() {
   return (
     <LegalLayout
       title="Refund Policy"
-      updated="September 25, 2026"
+      updated="October 12, 2026"
       intro="All payments for Hireword are processed by Paddle.com, acting as Merchant of Record. Paddle handles billing and refunds on our behalf."
       sections={sections}
     />

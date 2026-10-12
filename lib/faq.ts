@@ -39,6 +39,6 @@ export const HOME_FAQ: FaqItem[] = [
   },
   {
     q: "What if it does not work for me?",
-    a: "Try one free rewrite a day first. Every Pro payment, including renewals, has a 14-day money-back guarantee. Open Access & billing, verify your purchase email, and choose Request a refund under Request a refund. Confirm refund and stop renewal submits the request to Paddle. No support email is needed. Check the status there: awaiting approval is not yet an approved refund, and an approved refund ends the access from that payment.",
+    a: "Try one free rewrite a day first. Your first Pro payment has a 14-day money-back guarantee; renewals are refunded only where the law requires it or a fault on our side kept Pro from working. Open Access & billing, verify your purchase email, and choose Request a refund under Request a refund. Confirm refund and stop renewal submits the request to Paddle. No support email is needed. Check the status there: awaiting approval is not yet an approved refund, and an approved refund ends the access from that payment.",
   },
 ];

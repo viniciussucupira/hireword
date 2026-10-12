@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BILLING_COOKIE, readBillingSessionDetails } from "@/lib/billing";
-import { getRefundView, requestLatestPaymentRefund } from "@/lib/refunds";
+import { getRefundView, requestFirstPaymentRefund } from "@/lib/refunds";
 import { refundIntentStore, allowRecoveryAttempt } from "@/lib/redis";
 import { sessionSecret } from "@/lib/pro-cookie";
 import { sessionIsLive } from "@/lib/pro";
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     try { body = await req.json(); } catch { return reply({ error: "invalid_request" }, 400); }
     if (body?.confirmRefundAndCancellation !== true || typeof body.transactionId !== "string" || !/^txn_[a-z0-9]{26}$/.test(body.transactionId)) return reply({ error: "invalid_request" }, 400);
     if (!await allowRecoveryAttempt("refund-write", email, 10)) return reply({ error: "too_many_requests" }, 429);
-    const refund = await requestLatestPaymentRefund(email, body.transactionId, process.env.NEXT_PUBLIC_PADDLE_PRICE_ID || "", refundIntentStore);
+    const refund = await requestFirstPaymentRefund(email, body.transactionId, process.env.NEXT_PUBLIC_PADDLE_PRICE_ID || "", refundIntentStore);
     await reconcileApproved(refund);
     return reply({ refund });
   } catch { return reply({ error: "refund_not_confirmed" }, 503); }

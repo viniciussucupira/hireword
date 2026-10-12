@@ -37,8 +37,13 @@ function paidAt(tx: Transaction): number {
 function containsNative(tx: Transaction, price: string) { return tx.items?.some(i => (i.price?.id || i.price_id) === price); }
 function nativeOnly(tx: Transaction, price: string) { return Boolean(tx.items?.length && tx.items.every(i => (i.price?.id || i.price_id) === price)); }
 
-/** Find the latest paid Hireword purchase across all Paddle customers for the verified email. */
-async function latestPurchase(email: string, price: string, request: BillingTransport): Promise<Transaction | null> {
+/**
+ * Find the FIRST paid Hireword purchase across all Paddle customers for the verified email.
+ * Only that payment carries the 14-day guarantee (12 Oct 2026): a renewal does not, because
+ * refunding every renewal would let anybody use Pro every month for nothing. The earliest
+ * purchase stays the earliest after a refund, so subscribing again does not restart it.
+ */
+async function firstPurchase(email: string, price: string, request: BillingTransport): Promise<Transaction | null> {
   if (!price) throw new Error("Refund product unavailable");
   const customers = await pages<{ id: string; email: string }>(`/customers?email=${encodeURIComponent(email)}&status=active,archived`, request);
   const purchases: Transaction[] = [];
@@ -46,16 +51,16 @@ async function latestPurchase(email: string, price: string, request: BillingTran
     if (!customerPattern.test(customer.id) || customer.email.trim().toLowerCase() !== email.trim().toLowerCase()) continue;
     const transactions = await pages<Transaction>(`/transactions?customer_id=${customer.id}&status=completed&order_by=id[ASC]`, request);
     for (const tx of transactions) if (tx.customer_id === customer.id && tx.status === "completed" && containsNative(tx, price)) {
-      // Missing payment evidence must not make an older charge appear to be the latest.
+      // Missing payment evidence must never turn a renewal into a first purchase.
       if (!transactionPattern.test(tx.id) || !Number.isFinite(paidAt(tx))) throw new Error("Refund payment date unavailable");
       purchases.push(tx);
     }
   }
-  return purchases.sort((a, b) => paidAt(b) - paidAt(a) || b.id.localeCompare(a.id))[0] || null;
+  return purchases.sort((a, b) => paidAt(a) - paidAt(b) || a.id.localeCompare(b.id))[0] || null;
 }
 
 async function inspect(email: string, price: string, store: RefundIntentStore, request: BillingTransport, now: number) {
-  const first = await latestPurchase(email, price, request);
+  const first = await firstPurchase(email, price, request);
   const empty: RefundView = { transactionId: null, amount: null, currency: null, paidAt: null, deadline: null, state: "none" };
   if (!first) return { view: empty, transaction: null };
   const { data: tx } = await request<Transaction>(`/transactions/${first.id}`);
@@ -77,7 +82,7 @@ export async function getRefundView(email: string, price: string, store: RefundI
   return (await inspect(email, price, store, request, now)).view;
 }
 
-export async function requestLatestPaymentRefund(email: string, transactionId: string, price: string, store: RefundIntentStore, request = paddleBillingRequest, now = Date.now()): Promise<RefundView> {
+export async function requestFirstPaymentRefund(email: string, transactionId: string, price: string, store: RefundIntentStore, request = paddleBillingRequest, now = Date.now()): Promise<RefundView> {
   if (!transactionPattern.test(transactionId)) throw new Error("Invalid refund reference");
   const { view, transaction: tx } = await inspect(email, price, store, request, now);
   if (!tx || tx.id !== transactionId) throw new Error("Refund purchase unavailable");
@@ -91,7 +96,7 @@ export async function requestLatestPaymentRefund(email: string, transactionId: s
   try {
     const { data: adjustment } = await request<Adjustment>("/adjustments", {
       action: "refund", type: "full", transaction_id: tx.id,
-      reason: "Hireword latest-payment 14-day guarantee requested by verified customer",
+      reason: "Hireword first-payment 14-day guarantee requested by verified customer",
     });
     if (adjustment?.transaction_id !== tx.id || adjustment.action !== "refund" || adjustment.type !== "full" || !["pending_approval", "approved"].includes(adjustment.status)) throw new Error("Refund not confirmed");
     return { ...view, state: adjustment.status as "pending_approval" | "approved" };

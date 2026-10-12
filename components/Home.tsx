@@ -469,7 +469,7 @@ export default function Home() {
               cta="Subscribe monthly"
               href="/checkout"
               highlight
-              footnote="Full refund within 14 days of each payment, including renewals."
+              footnote="Full refund within 14 days of your first payment."
             />
           </div>
           <div className="mx-auto mt-6 flex max-w-md flex-col gap-2 rounded-2xl border border-line bg-ivory p-5 text-center">

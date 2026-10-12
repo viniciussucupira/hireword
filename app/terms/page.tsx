@@ -57,8 +57,8 @@ const sections: LegalSection[] = [
           taxes, and refunds. Purchases are also subject to the <a href="https://www.paddle.com/legal/buyer-terms">Paddle Buyer Terms</a>.</p>
         <p>You can <a href="/subscription#cancel">cancel on Hireword</a> after verifying your purchase email.
           Confirm cancellation before the next renewal to stop future renewals. You normally keep Pro until the
-          end of the paid billing period. Cancelling does not automatically request a refund. Every payment, including renewals,
-          has a 14-day money-back guarantee; see our <a href="/refunds">Refund Policy</a>.</p>
+          end of the paid billing period. Cancelling does not automatically request a refund. Your first payment
+          has a 14-day money-back guarantee, and renewals are refunded only where the law requires it or a fault on our side kept Pro from working; see our <a href="/refunds">Refund Policy</a>.</p>
       </>
     ),
   },
@@ -111,7 +111,7 @@ export default function TermsPage() {
   return (
     <LegalLayout
       title="Terms of Service"
-      updated="September 25, 2026"
+      updated="October 12, 2026"
       intro={
         <>
           Hireword is a product operated by Vinicius Colares Sucupira, an individual trading as Solrenning (&quot;we&quot;, &quot;us&quot;). By using hireword.com

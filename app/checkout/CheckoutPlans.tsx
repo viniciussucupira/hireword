@@ -252,7 +252,7 @@ export default function CheckoutPlans() {
             <PlanColumn plan={FREE_PLAN} footnote="One allowance per browser, resetting at midnight UTC.">
               <ButtonLink href="/#tool" variant="secondary" size="lg" className="w-full">Try the free rewriter</ButtonLink>
             </PlanColumn>
-            <PlanColumn plan={MONTHLY_PLAN} highlight footnote="Full refund within 14 days of each payment, including renewals.">
+            <PlanColumn plan={MONTHLY_PLAN} highlight footnote="Full refund within 14 days of your first payment.">
               {isPro ? <div role="status"><p className="mb-3 text-sm font-semibold text-success">Pro is already active in this browser. No new purchase is needed.</p><ButtonLink href="/#tool" size="lg" className="w-full">Continue rewriting</ButtonLink></div> : <>
               <Button
                 size="lg"
