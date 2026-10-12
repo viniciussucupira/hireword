@@ -38,3 +38,11 @@ export const CONTEXT_TYPES = [
 ] as const;
 
 export type ContextType = (typeof CONTEXT_TYPES)[number]["value"];
+
+// Where the payment page is served. Paddle opens a live checkout only on a
+// domain it has approved; nativeapply.net is, hireword.com is not yet. When
+// hireword.com reads "Checkout approved" in Paddle (Checkout, Website
+// approval), set this to "https://hireword.com" and drop "/checkout" from
+// LEGACY_STAYS in proxy.ts in the same change. See proxy.ts.
+export const CHECKOUT_ORIGIN = "https://nativeapply.net";
+

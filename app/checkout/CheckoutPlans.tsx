@@ -8,7 +8,8 @@ import { Button, ButtonLink, Container, Eyebrow, Section } from "@/components/ui
 import { IconCheck, IconLock, IconClock, IconShield, IconReceipt } from "@/components/ui/Icons";
 import { useProStatus, refreshProStatus } from "@/components/ui/useProStatus";
 import { activatePurchase } from "@/lib/payment-activation";
-import { PRO_BURST_LIMIT, PRO_BURST_SECONDS } from "@/lib/constants";
+import { CHECKOUT_ORIGIN, PRO_BURST_LIMIT, PRO_BURST_SECONDS } from "@/lib/constants";
+import { RECOVERY_ORIGIN } from "@/lib/recovery";
 
 type PaddleCheckoutEvent = {
   name: string;
@@ -92,6 +93,44 @@ export default function CheckoutPlans() {
   const checkoutInFlight = useRef(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
+  // The payment page may be served from an earlier, Paddle-approved address
+  // (see CHECKOUT_ORIGIN and proxy.ts). Pro is a cookie on the site's own
+  // name, so a purchase made there is handed back here with its transaction
+  // id after "#activate=", verified with Paddle, and switched on.
+  useEffect(() => {
+    if (window.location.origin !== RECOVERY_ORIGIN) return;
+    const match = window.location.hash.match(/^#activate=(txn_[a-z0-9]{26})$/);
+    if (!match) return;
+    const transactionId = match[1];
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    Promise.resolve().then(async () => {
+      setPaymentReceived(true);
+      setRestoreId(transactionId);
+      confirmationInFlight.current = true;
+      setConfirming(true);
+      try {
+        if (!await activatePurchase(transactionId)) throw new Error("Activation pending");
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.assign("/?upgraded=1");
+      } catch {
+        setCheckoutError("Your payment completed, but activation could not be confirmed. Use Log in below to retry. Do not pay again.");
+      } finally {
+        confirmationInFlight.current = false;
+        setConfirming(false);
+      }
+    });
+  }, []);
+
+  // Arrived from the site's own name to pay: open the checkout once it is ready.
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (autoStarted.current || !paddleReady || !accessReady || accessUnavailable) return;
+    if (window.location.origin === RECOVERY_ORIGIN || window.location.hash !== "#start") return;
+    autoStarted.current = true;
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    handleCheckout(MONTHLY_PRICE_ID);
+  });
+
   useEffect(() => {
     if (paddleReady) return;
     const timer = window.setTimeout(() => setCheckoutError("Checkout is taking longer than expected. Refresh this page or try again later."), 15000);
@@ -137,6 +176,12 @@ export default function CheckoutPlans() {
       return;
     }
     setRestoreId(transactionId);
+    if (window.location.origin !== RECOVERY_ORIGIN) {
+      // Paid on the earlier address: switch Pro on where it will be used.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign(`${RECOVERY_ORIGIN}/checkout#activate=${encodeURIComponent(transactionId)}`);
+      return;
+    }
     confirmationInFlight.current = true;
     setConfirming(true);
     const done = () => {
@@ -157,6 +202,15 @@ export default function CheckoutPlans() {
   }
 
   function handleCheckout(priceId: string) {
+    // Plans and Pro status are read here, on the site's own name, so a reader
+    // who already has Pro is never offered a second purchase. Only the
+    // payment itself opens on the Paddle-approved address (CHECKOUT_ORIGIN).
+    if (window.location.origin !== CHECKOUT_ORIGIN && window.location.origin === RECOVERY_ORIGIN) {
+      if (!priceId || paymentReceived || isPro || !accessReady || accessUnavailable) return;
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign(`${CHECKOUT_ORIGIN}/checkout#start`);
+      return;
+    }
     if (!window.Paddle || !priceId || checkoutInFlight.current || paymentReceived || isPro || !accessReady || accessUnavailable) return;
     checkoutInFlight.current = true;
     setCheckoutOpen(true);
