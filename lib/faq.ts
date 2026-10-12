@@ -23,7 +23,11 @@ export const HOME_FAQ: FaqItem[] = [
   },
   {
     q: "What does it cost?",
-    a: "Hireword Pro is US$19 a month and includes 600 rewrites per calendar month (UTC), renewing on the 1st. Long texts can count as more than one rewrite; the editor shows what is left after each one. Cancel on our Access & billing page and keep access until the end of your paid month. Try one free rewrite a day without an email or card. Each browser has its own free allowance, resetting at midnight UTC. Failed rewrites do not use it. On a very busy day, free rewrites can pause until midnight UTC.",
+    a: "Hireword Pro is US$19 a month. Cancel on our Access & billing page and keep access until the end of your paid month. Try one free rewrite a day without an email or card. Each browser has its own free allowance, resetting at midnight UTC. Failed rewrites do not use it. On a very busy day, free rewrites can pause until midnight UTC.",
+  },
+  {
+    q: "How much can I rewrite with Pro?",
+    a: "Up to 10 rewrites a day — a cover letter, a set of resume bullets or a recruiter message each count as one, up to 3,500 characters. Your 10 reset every day at 00:00 UTC. A monthly safeguard stops automated use; people writing their own applications don't reach it.",
   },
   {
     q: "Which English does it write — American or British?",

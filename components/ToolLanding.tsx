@@ -75,7 +75,7 @@ export default function ToolLanding({ page }: { page: ToolPage }) {
               </ButtonLink>
             </div>
             <p className="text-[0.875rem] text-muted">
-              One free rewrite a day. No email or card. Pro is 600 rewrites a month for $19, cancel anytime.
+              Hireword Pro is $19 a month, cancel anytime. Try one rewrite a day free, with no email or card.
             </p>
           </div>
         </Container>
@@ -86,7 +86,7 @@ export default function ToolLanding({ page }: { page: ToolPage }) {
       {/* ---------------- tool ---------------- */}
       <Section tone="white" id="tool" className="scroll-mt-20">
         <Container size="wide" className="py-12 sm:py-16">
-          <p className="mb-5 text-sm leading-6 text-muted">The Hireword editor, set to this document type. Paste English text up to 6,000 characters; review and copy the result into your application.</p>
+          <p className="mb-5 text-sm leading-6 text-muted">The Hireword editor, set to this document type. Paste English text up to 3,500 characters; review and copy the result into your application.</p>
           <Rewriter key={page.slug} initialContext={page.context} initialEnglishVariant={page.slug === "cv-english-rewriter" ? "en-GB" : "en-US"} lockContext placeholder={page.placeholder} />
         </Container>
       </Section>

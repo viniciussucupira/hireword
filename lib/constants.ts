@@ -3,12 +3,12 @@ export const APP_NAME = "Hireword";
 export const SUPPORT_EMAIL = "support@hireword.com";
 
 export const FREE_LIMIT_PER_DAY = 1;
-export const MAX_INPUT_CHARS = 6000;
+export const MAX_INPUT_CHARS = 3500;
 export const PRO_BURST_LIMIT = 20;
 export const PRO_BURST_SECONDS = 60;
 
 export const FREE_LIMIT_MESSAGE =
-    "Today's free rewrite in this browser has been used. Try again after midnight UTC, or get Pro for 600 rewrites a month.";
+    "Today's free rewrite in this browser has been used. Try again after midnight UTC, or get Pro to keep going.";
 
 export const CONTEXT_TYPES = [
   {

@@ -214,7 +214,7 @@ export function professionFaq(doc: DocType, p: Profession): FaqItem[] {
     },
     {
       q: `What does it cost for ${p.label.toLowerCase()}?`,
-      a: "Hireword Pro includes 600 rewrites a month for $19, with no lock-in. One free rewrite a day, with no email or card required, lets you see the result on your own text first.",
+      a: "Hireword Pro is $19 a month, with no lock-in. One free rewrite a day, with no email or card required, lets you see the result on your own text first.",
     },
     {
       q: `Can I use the same rewrite for every application?`,

@@ -14,6 +14,9 @@ import {
   reserveMeter,
   settleMeter,
   paymentPastDue,
+  reserveProDay,
+  refundProDay,
+  type DayReservation,
   type MeterReservation,
 } from "@/lib/redis";
 import { getProStatus } from "@/lib/pro";
@@ -24,10 +27,11 @@ import {
   FREE_POOL_MESSAGE,
   PAST_DUE_MESSAGE,
   MAX_OUTPUT_TOKENS,
-  PRO_MONTHLY_REWRITES,
-  allowanceUsedMessage,
+  PRO_DAILY_REWRITES,
   chargeFor,
-  remainingRewrites,
+  dailyLimitMessage,
+  monthlySafeguardMessage,
+  remainingToday,
   worstCaseMicroUsd,
 } from "@/lib/allowance";
 import { protectCompanyNames } from "@/lib/rewrite-names";
@@ -75,7 +79,7 @@ export async function POST(req: NextRequest) {
   }
     if (input.length > MAX_INPUT_CHARS) {
     return reply(
-        { error: "too_long", message: "Please paste up to 6,000 characters at a time, including spaces and line breaks." },
+        { error: "too_long", message: "Please paste up to 3,500 characters at a time, including spaces and line breaks." },
       { status: 400 }
     );
   }
@@ -133,32 +137,43 @@ Rules:
   const protectedDraft = protectCompanyNames(text, randomBytes(12).toString("hex"));
   const worstCase = worstCaseMicroUsd(systemPrompt, protectedDraft.text, MAX_OUTPUT_TOKENS);
   let meter: MeterReservation | null = null;
+  let day: DayReservation | null = null;
+  let dayCount = 0;
 
   // Account-scoped and atomic: changing browsers/IPs cannot multiply a Pro burst.
   if (pro) {
     try {
       if (!email || !await allowRecoveryAttempt("pro-rewrite-burst", email, PRO_BURST_LIMIT, PRO_BURST_SECONDS)) {
-        const response = reply({ error: "temporarily_limited", message: "Your Pro account has sent several requests in a short time. Please wait one minute and try again. Your draft is still here; you have not reached a daily limit." }, { status: 429 });
+        const response = reply({ error: "temporarily_limited", message: "Your Pro account has sent several requests in a short time. Please wait one minute and try again. Your draft is still here." }, { status: 429 });
         response.headers.set("Retry-After", String(PRO_BURST_SECONDS));
         return response;
       }
-      // The month's allowance, metered by cost: no paid call is made unless it fits.
-      // Lifetime is exempt on purpose. Until it was withdrawn it was sold for a
-      // single payment with no cap on rewrites, and those buyers keep what they
-      // bought. Nobody can buy it any more, so the exemption cannot grow; the
-      // burst limit above still applies to them.
+      // Lifetime is exempt from both limits below on purpose. Until it was
+      // withdrawn it was sold for a single payment with no cap on rewrites, and
+      // those buyers keep what they bought. Nobody can buy it any more, so the
+      // exemption cannot grow; the burst limit above still applies to them.
       if (!lifetime) {
+        // What the customer is sold: up to 10 a UTC day, each counting as one.
+        const today = await reserveProDay(email, reservation, now);
+        if (!today.ok) {
+          return reply({
+            error: "daily_limit_reached",
+            message: dailyLimitMessage(now),
+            allowance: { remaining: 0, limit: PRO_DAILY_REWRITES },
+          }, { status: 429 });
+        }
+        day = today.reservation;
+        dayCount = today.count;
+        // The backstop against automated use, metered by cost: no paid call is made unless it fits.
         const answer = await reserveMeter("pro", email, worstCase, now);
         if (!answer.ok) {
-          return reply({
-            error: "monthly_allowance_used",
-            message: allowanceUsedMessage(now),
-            allowance: { remaining: remainingRewrites(answer.used), limit: PRO_MONTHLY_REWRITES },
-          }, { status: 429 });
+          await refundProDay(day);
+          return reply({ error: "monthly_safeguard_reached", message: monthlySafeguardMessage(now) }, { status: 429 });
         }
         meter = answer.reservation;
       }
     } catch {
+      if (day) await refundProDay(day);
       return reply({ error: "access_unavailable", message: "We could not start your rewrite right now. Your draft is still here. Please try again shortly." }, { status: 503 });
     }
   } else {
@@ -181,7 +196,7 @@ Rules:
     const usage = await incrementDailyUsage(browser.id, reservation, usageDay);
     if (usage === USAGE_UNVERIFIABLE || usage > FREE_LIMIT_PER_DAY) {
       // Nothing will be sent to the model, so the pool gets its reservation back.
-      if (meter) await settleMeter(meter, chargeFor("free", null));
+      if (meter) await settleMeter(meter, chargeFor(null));
     }
     if (usage === USAGE_UNVERIFIABLE) {
       // Our counter is down. Don't hand out free rewrites we can't count, and
@@ -201,18 +216,26 @@ Rules:
     }
   }
 
-  const kind = pro ? "pro" : "free";
-  const fail = async (err: unknown, note = "", extra: object = {}) => {
+  const fail = async (err: unknown) => {
     // Do not log provider error objects: they may contain submitted text.
     console.error("rewrite failed", err instanceof Anthropic.APIError ? err.status : "generation_error");
-    // The visitor didn't get a rewrite, so don't spend their free one.
-    const allowanceRestored = pro || await refundDailyUsage(browser.id, reservation, usageDay);
+    // The person didn't get a rewrite, so don't spend their free one or one of
+    // today's Pro rewrites. The cost meters are settled separately: they count
+    // what the provider billed, not what the person received.
+    if (pro) {
+      const dayRestored = day ? await refundProDay(day) : false;
+      return reply(
+        { error: "server_error", message: "We could not finish your rewrite. Your draft is still here. Please try again shortly." +
+          (dayRestored ? " This attempt did not use one of today's rewrites." : "") },
+        { status: 500 }
+      );
+    }
+    const allowanceRestored = await refundDailyUsage(browser.id, reservation, usageDay);
     return reply(
       { error: "server_error", message: "We could not finish your rewrite. Your draft is still here. " +
-        (pro ? "Please try again shortly." + note : allowanceRestored
+        (allowanceRestored
           ? "This attempt did not use your free rewrite. Please try again shortly."
-          : "We could not restore your free allowance right now. Please contact support if your next attempt is blocked."),
-        ...extra },
+          : "We could not restore your free allowance right now. Please contact support if your next attempt is blocked.") },
       { status: 500 }
     );
   };
@@ -232,13 +255,13 @@ Rules:
     // timeout, a dropped connection) the request may have been processed and
     // billed, so the reservation stays on the meter.
     const refused = err instanceof Anthropic.APIError && typeof err.status === "number";
-    if (refused && meter) await settleMeter(meter, chargeFor(kind, null));
-    return fail(err, refused ? "" : " If the connection ended after the rewrite started, this attempt may count toward this month's allowance.");
+    if (refused && meter) await settleMeter(meter, chargeFor(null));
+    return fail(err);
   }
 
-  // Billed, so charged, whether or not the result turns out to be usable.
-  const used = meter ? await settleMeter(meter, chargeFor(kind, estimateRewriteCost(response.usage).costMicroUsd)) : null;
-  const allowance = pro && !lifetime && used !== null ? { remaining: remainingRewrites(used), limit: PRO_MONTHLY_REWRITES } : undefined;
+  // Billed, so charged on the cost meter, whether or not the result turns out to be usable.
+  if (meter) await settleMeter(meter, chargeFor(estimateRewriteCost(response.usage).costMicroUsd));
+  const allowance = pro && day ? { remaining: remainingToday(dayCount), limit: PRO_DAILY_REWRITES } : undefined;
 
   try {
     // Include billable responses even when generation is incomplete or unusable.
@@ -255,6 +278,6 @@ Rules:
     const totalRewrites = await incrementTotalRewrites();
     return reply(allowance ? { rewritten, totalRewrites, allowance } : { rewritten, totalRewrites });
   } catch (err) {
-    return fail(err, " The AI provider processed this attempt, so it counted toward this month's allowance.", allowance ? { allowance } : {});
+    return fail(err);
   }
 }

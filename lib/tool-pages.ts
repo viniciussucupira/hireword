@@ -35,7 +35,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       PRICE_LINE,
     ogTitle: "Cover Letter Rewriter",
     ogDescription:
-      "Improve your cover letter's English, compare it with your original, and make final edits. One free rewrite a day; Pro is US$19/month.",
+      "Improve your cover letter's English, compare it with your original, and make final edits. Pro is US$19/month; try one free rewrite a day.",
     eyebrow: "Cover letter rewriter",
     headingLead: "Your experience, expressed in",
     headingAccent: "clear, confident English",
@@ -93,7 +93,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       },
       {
         q: "Can I rewrite the whole letter at once?",
-        a: "Yes, up to 6,000 characters per request, including spaces and line breaks. For longer drafts, shorten the text or split it into parts within that limit. Each part uses a separate rewrite; the free allowance is one per browser per day.",
+        a: "Yes, up to 3,500 characters per request, including spaces and line breaks. For longer drafts, shorten the text or split it into parts within that limit. Each part uses a separate rewrite; the free allowance is one per browser per day.",
       },
       {
         q: "Does it keep the company name and role title?",
@@ -117,7 +117,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
       PRICE_LINE,
     ogTitle: "Clear, Concise Resume Bullets",
     ogDescription:
-      "Make resume bullets concise and natural, with a built-in number comparison. One free rewrite a day; Pro is US$19/month.",
+      "Make resume bullets concise and natural, with a built-in number comparison. Pro is US$19/month; try one free rewrite a day.",
     eyebrow: "Resume rewriter",
     headingLead: "Resume bullets that sound",
     headingAccent: "clear, concise, and professional",
@@ -168,7 +168,7 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
     faq: [
       {
         q: "Can I paste my whole experience section?",
-        a: "Yes. Paste every bullet from one role together so the rewrite keeps them parallel with each other. Up to 6,000 characters at a time.",
+        a: "Yes. Paste every bullet from one role together so the rewrite keeps them parallel with each other. Up to 3,500 characters at a time.",
       },
       {
         q: "Will it keep my bullet symbols?",

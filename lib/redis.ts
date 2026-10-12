@@ -6,6 +6,10 @@ import { RESERVE_FREE_SCRIPT, REFUND_FREE_SCRIPT } from "./free-session";
 import { sessionSecret } from "./pro-cookie";
 import {
   FREE_POOL_TTL_SECONDS,
+  PRO_DAILY_REWRITES,
+  PRO_DAY_TTL_SECONDS,
+  RESERVE_DAY_SCRIPT,
+  REFUND_DAY_SCRIPT,
   PRO_METER_TTL_SECONDS,
   RESERVE_METER_SCRIPT,
   SETTLE_METER_SCRIPT,
@@ -45,8 +49,9 @@ export async function recordRewriteCost(usage: TokenUsage, pro: boolean, email: 
 // ---------------------------------------------------------------------------
 // The cost meters (see lib/allowance.ts for the arithmetic)
 //
-//   na:allowance:pro:<YYYY-MM>:<hmac of the email>  micro-USD this month, per Pro account
-//   na:allowance:free-pool:<YYYY-MM-DD>             micro-USD today, all free visitors together
+//   na:allowance:pro-day:<YYYY-MM-DD>:<hmac of the email>  set of request ids started today, per Pro account
+//   na:allowance:pro:<YYYY-MM>:<hmac of the email>        micro-USD this month, per Pro account (the backstop)
+//   na:allowance:free-pool:<YYYY-MM-DD>                   micro-USD today, all free visitors together
 //
 // A reservation records the key it was made on, so a request that crosses
 // midnight or the end of a month settles where it reserved.
@@ -58,6 +63,37 @@ export type MeterAnswer = { ok: true; reservation: MeterReservation; used: numbe
 function proMeterKey(email: string, month: string): string {
   const account = createHmac("sha256", sessionSecret()).update(`nativeapply:allowance:${month}:${email.trim().toLowerCase()}`).digest("hex");
   return `na:allowance:pro:${month}:${account}`;
+}
+
+function proDayKey(email: string, day: string): string {
+  const account = createHmac("sha256", sessionSecret()).update(`nativeapply:allowance-day:${day}:${email.trim().toLowerCase()}`).digest("hex");
+  return `na:allowance:pro-day:${day}:${account}`;
+}
+
+export type DayReservation = { key: string; id: string };
+export type DayAnswer = { ok: true; reservation: DayReservation; count: number } | { ok: false; count: number };
+
+/** Take one of today's Pro rewrites for this request. Throws if the store cannot answer. */
+export async function reserveProDay(email: string, id: string, now = new Date()): Promise<DayAnswer> {
+  const client = getRedis();
+  if (!client) throw new Error("Day counter unavailable");
+  const key = proDayKey(email, meterDay(now));
+  const [admitted, count] = await client.eval<[string, number, number], [number, number]>(RESERVE_DAY_SCRIPT, [key], [id, PRO_DAILY_REWRITES, PRO_DAY_TTL_SECONDS]);
+  const n = Number(count) || 0;
+  return Number(admitted) === 1 ? { ok: true, reservation: { key, id }, count: n } : { ok: false, count: n };
+}
+
+/** Give back this request's rewrite, on the day it was taken. Never throws; false if it could not. */
+export async function refundProDay(reservation: DayReservation): Promise<boolean> {
+  try {
+    const client = getRedis();
+    if (!client) throw new Error("Day counter unavailable");
+    await client.eval<[string], number>(REFUND_DAY_SCRIPT, [reservation.key], [reservation.id]);
+    return true;
+  } catch {
+    console.error("na:allowance:day-refund-unavailable");
+    return false;
+  }
 }
 
 function freePoolKey(day: string): string {
