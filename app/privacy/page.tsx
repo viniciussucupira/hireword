@@ -153,10 +153,10 @@ export default function PrivacyPage() {
   return (
     <LegalLayout
       title="Privacy Policy"
-      updated="September 24, 2026"
+      updated="October 12, 2026"
       intro={
         <>
-          Hireword is operated by Solrenning (&quot;we&quot;, &quot;us&quot;). This page explains what data we
+          Hireword is operated by Vinicius Colares Sucupira, an individual trading as Solrenning (&quot;we&quot;, &quot;us&quot;), the controller of the personal data described here. This page explains what data we
           collect and why.
         </>
       }
