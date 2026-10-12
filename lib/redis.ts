@@ -32,7 +32,7 @@ export async function recordRewriteCost(usage: TokenUsage, pro: boolean, email: 
   }
 }
 
-// Reuses the SAME Upstash Redis instance as Retone. Every key this product
+// Reuses the SAME Upstash Redis instance as Fluentsmith. Every key this product
 // touches is namespaced with "na:" so it never collides with other products.
 let redis: Redis | null = null;
 

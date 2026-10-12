@@ -4,7 +4,7 @@ AI tool that rewrites cover letters, resume bullet points, and recruiter
 messages so they sound like a native English speaker wrote them — built for
 non-native professionals applying for jobs in the US, UK, Canada, and Europe.
 
-Same architecture as Retone: Next.js (App Router) + Tailwind, freemium
+Same architecture as Fluentsmith: Next.js (App Router) + Tailwind, freemium
 rate-limited by IP via the same Upstash Redis instance, Pro unlocked through
 Paddle (Merchant of Record) with a webhook, deployed on Vercel.
 
@@ -22,16 +22,16 @@ Paddle (Merchant of Record) with a webhook, deployed on Vercel.
 
 Copy `.env.example` to `.env.local` and fill in:
 
-- `ANTHROPIC_API_KEY` — same key used for Retone works fine here.
+- `ANTHROPIC_API_KEY` — same key used for Fluentsmith works fine here.
 - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` — copy the exact
-  same values from the Retone Vercel project. This app namespaces its own
-  keys (`na:...`) so it cannot collide with Retone's data in the same
+  same values from the Fluentsmith Vercel project. This app namespaces its own
+  keys (`na:...`) so it cannot collide with Fluentsmith's data in the same
   database — no new database needed.
 - `NEXT_PUBLIC_PADDLE_ENV`, `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`,
   `NEXT_PUBLIC_PADDLE_PRICE_ID`, `NEXT_PUBLIC_PADDLE_LIFETIME_PRICE_ID`,
   `PADDLE_WEBHOOK_SECRET`, `PADDLE_API_KEY` — from a **new product** created
-  under the existing Nimbus Labs Paddle seller account (same account as
-  Retone, just a new product + two new prices).
+  under the existing Paddle seller account (same account as
+  Fluentsmith, just a new product + two new prices).
 
 ## Local development
 
@@ -56,7 +56,7 @@ Logging in is by a one-time email link (Resend, verified sender). A receipt code
 
 ## Logging in and logging out (26 Sept 2026)
 
-The same way in as every Nimbus Labs product: **Log in** (`/login`) sends a one-time link — 32 random bytes stored only as a hash, 15 minutes, one use, carried after `#`, spent only by a POST from our own page after a tap.
+The same way in as every Solrenning product: **Log in** (`/login`) sends a one-time link — 32 random bytes stored only as a hash, 15 minutes, one use, carried after `#`, spent only by a POST from our own page after a tap.
 
 - Pro and billing sessions carry `iat`. Sessions made before it date themselves from their expiry, so nobody was logged out by the change.
 - **Log out** clears this browser's Pro and billing cookies. **Log out of all devices** (`/api/signout` with `{ everywhere: true }`, same-origin, needs a live session) stores `na:signout:<hash>` = now; every Pro or billing session issued at or before it is refused (`sessionIsLive` in `lib/pro.ts`), and `/api/me` removes the dead cookie. The key expires after 400 days, when no older session can still be valid.
@@ -89,7 +89,7 @@ Validation: unit tests cover ownership/product isolation, session separation and
   purchase / business account changes and need to be done by the account
   owner (or with the owner watching, one step at a time).
 - No custom favicon binary was hand-picked; `app/opengraph-image.tsx`
-  generates the social preview image dynamically, matching Retone's setup.
+  generates the social preview image dynamically, matching Fluentsmith's setup.
 
 
 ## Pricing and AI-cost measurement (September 24, 2026)

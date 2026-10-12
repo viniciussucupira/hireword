@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   try {
     if (event.event_type === "transaction.completed" && event.data) {
-      // Purchases of other Nimbus Labs products are ignored inside.
+      // Purchases of other Solrenning products are ignored inside.
       const incoming = event.data as unknown as PaddleTransaction;
       if (planForTransaction(incoming)) {
         // Read current adjustments so a delayed completed event cannot restore a refund.

@@ -2,9 +2,9 @@
 
 ## Production configuration
 
-- Resend domain: `mail.nativeapply.net` (DNS hosted on Vercel).
+- Resend domain: `mail.hireword.com` (DNS hosted on Vercel).
 - `RESEND_API_KEY`: a sending-only key restricted to that domain, stored only in Vercel's sensitive production environment variables.
-- `RECOVERY_EMAIL_FROM`: `NativeApply <access@mail.nativeapply.net>`.
+- `RECOVERY_EMAIL_FROM`: `Hireword <access@mail.hireword.com>`.
 - Uses existing Redis credentials and the existing Pro session signing secret.
 - Redeploy after adding environment variables. The email form remains hidden until both email variables exist.
 - Disable open/click tracking for this domain. Access tokens are URL fragments and must not be rewritten or tracked.
@@ -21,7 +21,7 @@ Run `npm run lint`, `npm test`, `npm run build`. Verify the mobile form and erro
 
 ## Validation on September 24, 2026
 
-- Resend verified DKIM, SPF and the return-path MX for `mail.nativeapply.net`; TLS is enforced and tracking is not configured.
+- Resend verified DKIM, SPF and the return-path MX for `mail.hireword.com`; TLS is enforced and tracking is not configured.
 - Production has a domain-restricted sending key stored as a Vercel Secret, plus the configured sender.
 - 13 unit tests, lint and production build passed. Mobile layout checked at 390px.
 - Local end-to-end fixture verified request validation, same-origin protection, delivery adapter, signed Pro cookie, `/api/me` paid status, unpaid denial, replay rejection and request rate limiting. The fixture did not call real payment/email services.

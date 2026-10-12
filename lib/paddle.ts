@@ -10,7 +10,7 @@ import {
 } from "./redis";
 import { purchasePlan, purchaseRefunded, paidMonthlyExpiry, type Purchase, type PurchaseSubscription } from "./purchase-validation";
 
-// The Nimbus Labs Paddle account is shared by several products (Retone,
+// The Paddle account is shared by several products (Fluentsmith,
 // Hireword, ...). Paddle sends every product's events to every webhook
 // destination, so a transaction only unlocks Hireword Pro when it contains
 // one of Hireword's own prices.
