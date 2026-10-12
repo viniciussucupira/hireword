@@ -43,6 +43,7 @@ npm run dev
 ## Rewrite experience and validation
 
 - One free rewrite per day, without an email gate. Production usage checks fail closed if Redis is unavailable.
+- Every model call is metered by cost before it is made (`lib/allowance.ts`, which holds the arithmetic): Pro gets 600 rewrites ($6.00 of model cost) per account per calendar month (UTC), and all free use together gets $1.00 a day. If the meter cannot be read, no call is made.
 - American English is the default; British English is available in every editor.
 - Results include the submitted original and a comparison of digit-based expressions. This check is not verification of names, claims, or meaning.
 - Run `npm test` on Node 22.18+ or 24+, `npm run lint`, and `npm run build` before publishing.

@@ -7,6 +7,7 @@ import {
   revokeMonthlyForSubscription,
   clearReversedRefund,
   capMonthlyForSubscription,
+  setPaymentPastDue,
 } from "./redis";
 import { purchasePlan, purchaseRefunded, paidMonthlyExpiry, type Purchase, type PurchaseSubscription } from "./purchase-validation";
 
@@ -100,8 +101,10 @@ export async function refreshMonthlyPro(email: string): Promise<boolean> {
   if (!sub) throw new Error("Subscription lookup unavailable");
   if (!["active", "past_due", "trialing"].includes(sub.status || "")) {
     await clearSubscriptionId(email);
+    await setPaymentPastDue(email, false);
     return false;
   }
+  await setPaymentPastDue(email, sub.status === "past_due");
   for await (const candidate of completedTransactions(`subscription_id=${subscriptionId}`)) {
     if (!mayHaveAccess(candidate)) continue;
     const tx = await fetchTransaction(candidate.id);
@@ -157,11 +160,28 @@ export async function reconcileSubscription(subscriptionId: string): Promise<voi
   if (!sub.customer_id || !sub.items?.some(item => (item.price?.id ?? item.price_id) === MONTHLY_PRICE_ID)) return;
   const email = await fetchCustomerEmail(sub.customer_id);
   if (!email) throw new Error("Customer lookup unavailable");
+  await setPaymentPastDue(email, sub.status === "past_due");
   if (["canceled", "paused"].includes(sub.status || "")) await revokeMonthlyForSubscription(email, subscriptionId);
   else if (["cancel", "pause"].includes(sub.scheduled_change?.action || "")) {
     const end = Date.parse(sub.scheduled_change?.effective_at || "");
     if (Number.isFinite(end)) await capMonthlyForSubscription(email, subscriptionId, Math.floor(end / 1000));
   }
+}
+
+/**
+ * Asked only when this account is marked past due, before refusing a paid
+ * rewrite: reads the subscription's status from Paddle again, so a recovery
+ * whose webhook never arrived does not keep a paying customer paused.
+ * Throws if Paddle cannot answer; the caller then keeps the mark.
+ */
+export async function stillPastDue(email: string): Promise<boolean> {
+  const subscriptionId = await getSubscriptionId(email);
+  if (!subscriptionId) { await setPaymentPastDue(email, false); return false; }
+  const sub = await paddleGet<PurchaseSubscription>(`/subscriptions/${subscriptionId}`);
+  if (!sub) throw new Error("Subscription lookup unavailable");
+  const pastDue = sub.status === "past_due";
+  await setPaymentPastDue(email, pastDue);
+  return pastDue;
 }
 
 /** Email proof can recover a purchase even when both initial activation and webhook were missed. */

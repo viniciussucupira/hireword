@@ -4,6 +4,16 @@ import { createHmac } from "node:crypto";
 import { estimateRewriteCost, type TokenUsage, REWRITE_MODEL } from "./ai-cost";
 import { RESERVE_FREE_SCRIPT, REFUND_FREE_SCRIPT } from "./free-session";
 import { sessionSecret } from "./pro-cookie";
+import {
+  FREE_POOL_TTL_SECONDS,
+  PRO_METER_TTL_SECONDS,
+  RESERVE_METER_SCRIPT,
+  SETTLE_METER_SCRIPT,
+  meterDay,
+  meterLimits,
+  meterMonth,
+  type MeterKind,
+} from "./allowance";
 
 /** Cost metadata only; never store customer drafts, outputs, email addresses or IPs. */
 export async function recordRewriteCost(usage: TokenUsage, pro: boolean, email: string | null) {
@@ -29,6 +39,64 @@ export async function recordRewriteCost(usage: TokenUsage, pro: boolean, email: 
   } catch {
     // A metrics outage must never charge the free quota without delivering the result.
     console.error("na:ai-cost:storage-unavailable");
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The cost meters (see lib/allowance.ts for the arithmetic)
+//
+//   na:allowance:pro:<YYYY-MM>:<hmac of the email>  micro-USD this month, per Pro account
+//   na:allowance:free-pool:<YYYY-MM-DD>             micro-USD today, all free visitors together
+//
+// A reservation records the key it was made on, so a request that crosses
+// midnight or the end of a month settles where it reserved.
+// ---------------------------------------------------------------------------
+
+export type MeterReservation = { kind: MeterKind; key: string; reserved: number };
+export type MeterAnswer = { ok: true; reservation: MeterReservation; used: number } | { ok: false; used: number };
+
+function proMeterKey(email: string, month: string): string {
+  const account = createHmac("sha256", sessionSecret()).update(`nativeapply:allowance:${month}:${email.trim().toLowerCase()}`).digest("hex");
+  return `na:allowance:pro:${month}:${account}`;
+}
+
+function freePoolKey(day: string): string {
+  return `na:allowance:free-pool:${day}`;
+}
+
+/**
+ * Reserve this request's worst case. Throws if the meter cannot be reached:
+ * the caller must then refuse, because an unmetered paid call is not allowed.
+ */
+export async function reserveMeter(kind: MeterKind, email: string | null, amount: number, now = new Date()): Promise<MeterAnswer> {
+  const client = getRedis();
+  if (!client) throw new Error("Meter storage unavailable");
+  if (kind === "pro" && !email) throw new Error("Pro meter needs an account");
+  const key = kind === "pro" ? proMeterKey(email!, meterMonth(now)) : freePoolKey(meterDay(now));
+  const limits = meterLimits(kind, amount);
+  const ttl = kind === "pro" ? PRO_METER_TTL_SECONDS : FREE_POOL_TTL_SECONDS;
+  const [admitted, total] = await client.eval<[number, number, number, number, number], [number, number]>(
+    RESERVE_METER_SCRIPT, [key], [amount, limits.budget, limits.floorUnit, limits.ceiling, ttl],
+  );
+  const used = Number(total) || 0;
+  return Number(admitted) === 1 ? { ok: true, reservation: { kind, key, reserved: amount }, used } : { ok: false, used };
+}
+
+/**
+ * Replace the reservation with what was charged. Never throws: if the store
+ * cannot be reached the worst case stays on the meter, which over-counts
+ * rather than under-counts. Returns the new total, or null if unknown.
+ */
+export async function settleMeter(reservation: MeterReservation, charged: number): Promise<number | null> {
+  try {
+    const client = getRedis();
+    if (!client) throw new Error("Meter storage unavailable");
+    const ttl = reservation.kind === "pro" ? PRO_METER_TTL_SECONDS : FREE_POOL_TTL_SECONDS;
+    const total = await client.eval<[number, number], number>(SETTLE_METER_SCRIPT, [reservation.key], [charged - reservation.reserved, ttl]);
+    return Number(total) || 0;
+  } catch {
+    console.error("na:allowance:settle-unavailable", reservation.kind);
+    return null;
   }
 }
 
@@ -145,6 +213,34 @@ export async function refundDailyUsage(browserId: string, reservation: string, d
 
 function proKey(email: string): string {
   return `na:pro:${email.trim().toLowerCase()}`;
+}
+
+/** The stored Pro record ("monthly:…", "lifetime:…" or legacy "1"), or null. Throws if the store cannot answer. */
+export async function getProRecord(email: string): Promise<string | null> {
+  const client = getRedis();
+  if (!client) throw new Error("Pro storage unavailable");
+  const value = await client.get(proKey(email));
+  return value === null || value === undefined ? null : String(value);
+}
+
+// A subscription whose last renewal failed. Paddle keeps it "past_due" while
+// it retries, and lib/purchase-validation.ts gives such an account three days
+// of grace past the paid period — time nobody has paid for, so paid rewrites
+// pause during it. Written from Paddle's own answer (webhook or a direct
+// lookup) and kept four days at most, so a missed recovery event cannot hold
+// a paying customer back for longer than the grace it shadows.
+const PAST_DUE_TTL_SECONDS = 4 * DAY_SECONDS;
+const pastDueKey = (email: string) => `na:past-due:${recoveryHash(`nativeapply:past-due:${email.trim().toLowerCase()}`)}`;
+
+export async function setPaymentPastDue(email: string, pastDue: boolean): Promise<void> {
+  const client = recoveryClient();
+  if (pastDue) await client.set(pastDueKey(email), 1, { ex: PAST_DUE_TTL_SECONDS });
+  else await client.del(pastDueKey(email));
+}
+
+/** Throws if the store cannot answer. */
+export async function paymentPastDue(email: string): Promise<boolean> {
+  return Boolean(await recoveryClient().get(pastDueKey(email)));
 }
 
 export async function isPro(email: string): Promise<boolean> {

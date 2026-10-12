@@ -240,7 +240,7 @@ export default function CheckoutPlans() {
           <div className="na-rise mx-auto flex max-w-2xl flex-col items-center gap-4 text-center">
             <Eyebrow>Pricing</Eyebrow>
             <h1 className="text-[2rem] font-semibold leading-[1.1] tracking-[-0.03em] text-navy sm:text-[2.75rem]">
-              Unlimited rewrites for <span className="na-accent-text">$19 a month</span>
+              600 rewrites for <span className="na-accent-text">$19 a month</span>
             </h1>
             <p className="text-[1.0625rem] leading-7 text-muted">
               One paid plan with everything in it. Try it free first, and cancel the moment your job search ends —
@@ -276,7 +276,7 @@ export default function CheckoutPlans() {
             </PlanColumn>
           </div>
 
-          <p className="mx-auto mt-8 max-w-2xl text-center text-sm leading-6 text-muted">Both plans use the same rewriting tool, English styles, and number comparison. Each request accepts up to 6,000 characters. Pro removes the daily rewrite limit, with a safeguard of {PRO_BURST_LIMIT} requests per {PRO_BURST_SECONDS} seconds per account.</p>
+          <p className="mx-auto mt-8 max-w-2xl text-center text-sm leading-6 text-muted">Both plans use the same rewriting tool, English styles, and number comparison. Each request accepts up to 6,000 characters. Pro includes 600 rewrites per calendar month (UTC), renewing on the 1st, with a safeguard of {PRO_BURST_LIMIT} requests per {PRO_BURST_SECONDS} seconds per account. Long texts can count as more than one rewrite; the editor shows what is left after each one.</p>
           <p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-6 text-muted">No Hireword account or password to create. Pay securely with Paddle, keep your receipt, and Pro activates in this browser. <Link href="/subscription" className="font-semibold text-brand-700 underline">Access & billing help</Link> · <Link href="/subscription#cancel" className="font-semibold text-brand-700 underline">How to cancel</Link></p>
 
           <ul className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-x-7 gap-y-3 text-[0.875rem] text-muted">
@@ -301,7 +301,7 @@ export default function CheckoutPlans() {
             <div className="rounded-2xl border border-line bg-white p-6">
               <h2 className="text-[1.0625rem] font-semibold text-navy">What you are paying for</h2>
               <p className="mt-2.5 text-[0.9375rem] leading-6 text-muted">
-                Unlimited rewrites while the subscription is active, all four document types, and no lock-in: you
+                600 rewrites a month while the subscription is active (long texts can count as more than one), all four document types, and no lock-in: you
                 cancel on the Hireword Access & billing page and keep access until the end of the month you paid for.
               </p>
               <p className="mt-3 text-[0.9375rem] leading-6 text-muted">

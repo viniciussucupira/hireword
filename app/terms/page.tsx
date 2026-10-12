@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import LegalLayout, { type LegalSection } from "@/components/legal/LegalLayout";
 import { SUPPORT_EMAIL, PRO_BURST_LIMIT, PRO_BURST_SECONDS } from "@/lib/constants";
+import { PRO_MONTHLY_REWRITES } from "@/lib/allowance";
 
 export const metadata: Metadata = {
   title: "Terms of Service | Hireword",
@@ -17,7 +18,9 @@ const sections: LegalSection[] = [
         Hireword rewrites text you submit — such as cover letters, resume bullet points, and messages to
         recruiters — using artificial intelligence, so it reads more clearly and professionally. Without a
         paid plan, use is limited to one rewrite per browser per day, resetting at midnight UTC. Failed generations
-        do not use this allowance. Hireword Pro removes the daily limit. Each request supports up to 6,000 characters,
+        do not use this allowance. Free rewrites also share a daily ceiling across all free users; when it is reached,
+        free rewrites pause until midnight UTC. Hireword Pro includes {PRO_MONTHLY_REWRITES} rewrites per calendar month, as
+        described in section 5. Each request supports up to 6,000 characters,
         including spaces and line breaks. Some symbols, such as emoji, count as more than one character in the editor.
       </p>
     ),
@@ -71,9 +74,19 @@ const sections: LegalSection[] = [
           request a single-use login link at <a href="/login">Log in</a> using your purchase email.
           Links expire after 15 minutes. Keep login links private and contact support if you lose access to that email.
           You can log out of one browser, or of every device at once, from the same page.</p>
+        <p>Pro includes {PRO_MONTHLY_REWRITES} rewrites per calendar month (UTC) for each Pro account, renewing at
+          00:00 UTC on the 1st of each month. Rewrites are metered by length: a typical draft counts as one rewrite,
+          and a long text can count as more than one. The editor shows what is left after each rewrite. A rewrite
+          starts only while at least one is left; one that starts with fewer left than it needs is completed, and
+          the allowance then reads zero until it renews. An attempt the AI provider processed counts even if we could
+          not show a usable result; if the connection ends before we learn its length, it counts at the most it
+          could have used. An attempt the provider refused does not count. Unused rewrites do not carry over
+          to the next month, and the allowance has no cash value. While a Pro renewal payment is past due, Pro
+          rewrites pause until the payment succeeds; the free daily rewrite stays available. A Lifetime purchase
+          made while that plan was sold keeps the access it was sold, without the monthly allowance.</p>
         <p>Do not disrupt the service or attempt to bypass security controls. Temporary safeguards may limit
-          abusive traffic. Pro has no daily rewrite allowance. To protect availability, each Pro account can
-          submit up to {PRO_BURST_LIMIT} rewrite requests per {PRO_BURST_SECONDS} seconds across its browsers and devices.
+          abusive traffic. To protect availability, each Pro account can also submit up to {PRO_BURST_LIMIT} rewrite
+          requests per {PRO_BURST_SECONDS} seconds across its browsers and devices.
           Service interruptions can still occur.
           If you cannot use a paid service, contact us so we can restore access or address the payment.</p>
         <p>Our <a href="/privacy">Privacy Policy</a> explains how text, access details, and usage data are processed.</p>

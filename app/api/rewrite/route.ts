@@ -11,10 +11,25 @@ import {
   refundDailyUsage,
   recordRewriteCost,
   allowRecoveryAttempt,
+  reserveMeter,
+  settleMeter,
+  paymentPastDue,
+  type MeterReservation,
 } from "@/lib/redis";
 import { getProStatus } from "@/lib/pro";
+import { stillPastDue } from "@/lib/paddle";
 import { ENGLISH_VARIANTS } from "@/lib/rewrite-review";
-import { REWRITE_MODEL } from "@/lib/ai-cost";
+import { REWRITE_MODEL, estimateRewriteCost } from "@/lib/ai-cost";
+import {
+  FREE_POOL_MESSAGE,
+  PAST_DUE_MESSAGE,
+  MAX_OUTPUT_TOKENS,
+  PRO_MONTHLY_REWRITES,
+  allowanceUsedMessage,
+  chargeFor,
+  remainingRewrites,
+  worstCaseMicroUsd,
+} from "@/lib/allowance";
 import { protectCompanyNames } from "@/lib/rewrite-names";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 45000, maxRetries: 0 });
@@ -67,50 +82,27 @@ export async function POST(req: NextRequest) {
 
   let pro: boolean;
   let email: string | null;
+  let lifetime = false;
   try {
-    ({ pro, email } = await getProStatus());
+    ({ pro, email, lifetime = false } = await getProStatus());
   } catch {
     return reply({ error: "access_unavailable", message: "We could not check your access right now. Please try again shortly; your draft has not been changed." }, { status: 503 });
   }
+
+  // A monthly subscription whose last renewal failed is still Pro for a few
+  // days of grace, but nobody has paid for those days, so paid rewrites pause.
+  // For this request the person is an ordinary visitor: the free daily
+  // rewrite still works, and the refusal that follows it says why.
+  let pastDue = false;
+  if (pro && !lifetime && email) {
+    try { pastDue = await paymentPastDue(email); }
+    catch { return reply({ error: "access_unavailable", message: "We could not start your rewrite right now. Your draft is still here. Please try again shortly." }, { status: 503 }); }
+    // Ask Paddle once more before pausing anybody; if it cannot answer, the mark stands.
+    if (pastDue) { try { pastDue = await stillPastDue(email); } catch { /* keep the mark */ } }
+    if (pastDue) pro = false;
+  }
   const ip = getClientIp(req);
-
-  // Account-scoped and atomic: changing browsers/IPs cannot multiply a Pro burst.
-  // This protects provider capacity without introducing a daily Pro allowance.
-  if (pro) {
-    try {
-      if (!email || !await allowRecoveryAttempt("pro-rewrite-burst", email, PRO_BURST_LIMIT, PRO_BURST_SECONDS)) {
-        const response = reply({ error: "temporarily_limited", message: "Your Pro account has sent several requests in a short time. Please wait one minute and try again. Your draft is still here; you have not reached a daily limit." }, { status: 429 });
-        response.headers.set("Retry-After", String(PRO_BURST_SECONDS));
-        return response;
-      }
-    } catch {
-      return reply({ error: "access_unavailable", message: "We could not start your rewrite right now. Your draft is still here. Please try again shortly." }, { status: 503 });
-    }
-  }
-
-  if (!pro) {
-    // A separate generous network safeguard prevents automated cookie cycling.
-    // It is never presented as the customer's daily allowance.
-    try {
-      if (!await allowRecoveryAttempt("free-network-safety", ip, 60)) return reply({ error: "temporarily_limited", message: "There are unusually many requests from this connection. Please try again later. This is separate from your free daily allowance." }, { status: 429 });
-    } catch { return reply({ error: "usage_unavailable", message: "We could not check free access. Please try again shortly." }, { status: 503 }); }
-    const usage = await incrementDailyUsage(browser.id, reservation, usageDay);
-    if (usage === USAGE_UNVERIFIABLE) {
-      // Our counter is down. Don't hand out free rewrites we can't count, and
-      // don't tell the person they used one they never got.
-      return reply(
-        {
-          error: "usage_unavailable",
-          message:
-            "We could not check today's free rewrite just now — that is a problem on our side, not with your text. Please try again in a minute.",
-        },
-        { status: 503 }
-      );
-    }
-    if (usage > FREE_LIMIT_PER_DAY) {
-      return reply({ error: "limit_reached", message: FREE_LIMIT_MESSAGE }, { status: 429 });
-    }
-  }
+  const now = new Date();
 
   const systemPrompt = `You are a conservative copy editor for job-application text. Improve the English of the supplied draft without writing new application content.
 
@@ -137,16 +129,118 @@ Rules:
 - Tokens starting with NATIVEAPPLY_NAME_ and ending with _END represent protected company names. Copy every token exactly once in its original position within the text. Never change, omit, duplicate, expand, or translate these tokens.
 - Output ONLY the rewritten text. No preamble, no explanation, no quotation marks around it.`;
 
+  // The draft as the model will see it, so the reservation is sized on what is actually sent.
+  const protectedDraft = protectCompanyNames(text, randomBytes(12).toString("hex"));
+  const worstCase = worstCaseMicroUsd(systemPrompt, protectedDraft.text, MAX_OUTPUT_TOKENS);
+  let meter: MeterReservation | null = null;
+
+  // Account-scoped and atomic: changing browsers/IPs cannot multiply a Pro burst.
+  if (pro) {
+    try {
+      if (!email || !await allowRecoveryAttempt("pro-rewrite-burst", email, PRO_BURST_LIMIT, PRO_BURST_SECONDS)) {
+        const response = reply({ error: "temporarily_limited", message: "Your Pro account has sent several requests in a short time. Please wait one minute and try again. Your draft is still here; you have not reached a daily limit." }, { status: 429 });
+        response.headers.set("Retry-After", String(PRO_BURST_SECONDS));
+        return response;
+      }
+      // The month's allowance, metered by cost: no paid call is made unless it fits.
+      // Lifetime is exempt on purpose. Until it was withdrawn it was sold for a
+      // single payment with no cap on rewrites, and those buyers keep what they
+      // bought. Nobody can buy it any more, so the exemption cannot grow; the
+      // burst limit above still applies to them.
+      if (!lifetime) {
+        const answer = await reserveMeter("pro", email, worstCase, now);
+        if (!answer.ok) {
+          return reply({
+            error: "monthly_allowance_used",
+            message: allowanceUsedMessage(now),
+            allowance: { remaining: remainingRewrites(answer.used), limit: PRO_MONTHLY_REWRITES },
+          }, { status: 429 });
+        }
+        meter = answer.reservation;
+      }
+    } catch {
+      return reply({ error: "access_unavailable", message: "We could not start your rewrite right now. Your draft is still here. Please try again shortly." }, { status: 503 });
+    }
+  } else {
+    // A separate generous network safeguard prevents automated cookie cycling.
+    // It is never presented as the customer's daily allowance.
+    try {
+      if (!await allowRecoveryAttempt("free-network-safety", ip, 60)) return reply({ error: "temporarily_limited", message: "There are unusually many requests from this connection. Please try again later. This is separate from your free daily allowance." }, { status: 429 });
+    } catch { return reply({ error: "usage_unavailable", message: "We could not check free access. Please try again shortly." }, { status: 503 }); }
+    // The shared daily pool is checked BEFORE the visitor's own allowance, so
+    // a paused day never spends anybody's free rewrite.
+    try {
+      const answer = await reserveMeter("free", null, worstCase, now);
+      if (!answer.ok) {
+        return pastDue
+          ? reply({ error: "payment_past_due", message: PAST_DUE_MESSAGE }, { status: 402 })
+          : reply({ error: "free_pool_used", message: FREE_POOL_MESSAGE }, { status: 429 });
+      }
+      meter = answer.reservation;
+    } catch { return reply({ error: "usage_unavailable", message: "We could not check free access. Please try again shortly. Your draft is still here." }, { status: 503 }); }
+    const usage = await incrementDailyUsage(browser.id, reservation, usageDay);
+    if (usage === USAGE_UNVERIFIABLE || usage > FREE_LIMIT_PER_DAY) {
+      // Nothing will be sent to the model, so the pool gets its reservation back.
+      if (meter) await settleMeter(meter, chargeFor("free", null));
+    }
+    if (usage === USAGE_UNVERIFIABLE) {
+      // Our counter is down. Don't hand out free rewrites we can't count, and
+      // don't tell the person they used one they never got.
+      return reply(
+        {
+          error: "usage_unavailable",
+          message:
+            "We could not check today's free rewrite just now — that is a problem on our side, not with your text. Please try again in a minute.",
+        },
+        { status: 503 }
+      );
+    }
+    if (usage > FREE_LIMIT_PER_DAY) {
+      if (pastDue) return reply({ error: "payment_past_due", message: PAST_DUE_MESSAGE }, { status: 402 });
+      return reply({ error: "limit_reached", message: FREE_LIMIT_MESSAGE }, { status: 429 });
+    }
+  }
+
+  const kind = pro ? "pro" : "free";
+  const fail = async (err: unknown, note = "", extra: object = {}) => {
+    // Do not log provider error objects: they may contain submitted text.
+    console.error("rewrite failed", err instanceof Anthropic.APIError ? err.status : "generation_error");
+    // The visitor didn't get a rewrite, so don't spend their free one.
+    const allowanceRestored = pro || await refundDailyUsage(browser.id, reservation, usageDay);
+    return reply(
+      { error: "server_error", message: "We could not finish your rewrite. Your draft is still here. " +
+        (pro ? "Please try again shortly." + note : allowanceRestored
+          ? "This attempt did not use your free rewrite. Please try again shortly."
+          : "We could not restore your free allowance right now. Please contact support if your next attempt is blocked."),
+        ...extra },
+      { status: 500 }
+    );
+  };
+
+  let response;
   try {
-    const protectedDraft = protectCompanyNames(text, randomBytes(12).toString("hex"));
-    const response = await anthropic.messages.create({
+    response = await anthropic.messages.create({
       model: REWRITE_MODEL,
-      max_tokens: 4096,
+      max_tokens: MAX_OUTPUT_TOKENS,
       temperature: 0,
       system: systemPrompt,
       messages: [{ role: "user", content: protectedDraft.text }],
     });
+  } catch (err) {
+    // An answer with a status is the provider refusing the request, which it
+    // does not bill: the reservation is released. With no answer at all (a
+    // timeout, a dropped connection) the request may have been processed and
+    // billed, so the reservation stays on the meter.
+    const refused = err instanceof Anthropic.APIError && typeof err.status === "number";
+    if (refused && meter) await settleMeter(meter, chargeFor(kind, null));
+    return fail(err, refused ? "" : " If the connection ended after the rewrite started, this attempt may count toward this month's allowance.");
+  }
 
+  // Billed, so charged, whether or not the result turns out to be usable.
+  const used = meter ? await settleMeter(meter, chargeFor(kind, estimateRewriteCost(response.usage).costMicroUsd)) : null;
+  const allowance = pro && !lifetime && used !== null ? { remaining: remainingRewrites(used), limit: PRO_MONTHLY_REWRITES } : undefined;
+
+  try {
     // Include billable responses even when generation is incomplete or unusable.
     await recordRewriteCost(response.usage, pro, email);
     const generated = response.content
@@ -159,18 +253,8 @@ Rules:
     const rewritten = protectedDraft.restore(generated);
 
     const totalRewrites = await incrementTotalRewrites();
-    return reply({ rewritten, totalRewrites });
+    return reply(allowance ? { rewritten, totalRewrites, allowance } : { rewritten, totalRewrites });
   } catch (err) {
-    // Do not log provider error objects: they may contain submitted text.
-    console.error("rewrite failed", err instanceof Anthropic.APIError ? err.status : "generation_error");
-    // The visitor didn't get a rewrite, so don't spend their free one.
-    const allowanceRestored = pro || await refundDailyUsage(browser.id, reservation, usageDay);
-    return reply(
-      { error: "server_error", message: "We could not finish your rewrite. Your draft is still here. " +
-        (pro ? "Please try again shortly." : allowanceRestored
-          ? "This attempt did not use your free rewrite. Please try again shortly."
-          : "We could not restore your free allowance right now. Please contact support if your next attempt is blocked.") },
-      { status: 500 }
-    );
+    return fail(err, " The AI provider processed this attempt, so it counted toward this month's allowance.", allowance ? { allowance } : {});
   }
 }

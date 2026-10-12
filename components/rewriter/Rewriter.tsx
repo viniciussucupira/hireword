@@ -17,6 +17,17 @@ import {
 } from "@/components/ui/Icons";
 import { useProStatus } from "@/components/ui/useProStatus";
 import { textSharing } from "@/lib/text-sharing";
+import { PRO_MONTHLY_REWRITES } from "@/lib/allowance";
+
+type Allowance = { remaining: number; limit: number };
+
+function readAllowance(value: unknown): Allowance | null {
+  if (!value || typeof value !== "object") return null;
+  const { remaining, limit } = value as Record<string, unknown>;
+  return Number.isSafeInteger(remaining) && Number.isSafeInteger(limit) && Number(remaining) >= 0 && Number(limit) > 0
+    ? { remaining: Number(remaining), limit: Number(limit) }
+    : null;
+}
 
 const MAX_CHARS = MAX_INPUT_CHARS;
 
@@ -62,6 +73,8 @@ export default function Rewriter({
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState("");
   const [limitReached, setLimitReached] = useState(false);
+  const [allowanceUsed, setAllowanceUsed] = useState(false);
+  const [allowance, setAllowance] = useState<Allowance | null>(null);
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState("");
 
@@ -117,6 +130,7 @@ export default function Rewriter({
       setPhase("loading");
       setError("");
       setLimitReached(false);
+      setAllowanceUsed(false);
       setCopied(false); setCopyError("");
       try {
         const res = await fetch("/api/rewrite", {
@@ -126,8 +140,11 @@ export default function Rewriter({
           signal: AbortSignal.timeout(60000),
         });
         const data = await res.json().catch(() => ({}));
+        const left = readAllowance(data.allowance);
+        if (left) setAllowance(left);
         if (!res.ok) {
-          if (data.error === "limit_reached") setLimitReached(true);
+          if (data.error === "limit_reached" || data.error === "free_pool_used") setLimitReached(true);
+          if (data.error === "monthly_allowance_used" || data.error === "payment_past_due") setAllowanceUsed(true);
           setError(data.message || "Something went wrong. Please try again.");
           setPhase("error");
           return;
@@ -178,6 +195,7 @@ export default function Rewriter({
     setPhase("idle");
     setError("");
     setLimitReached(false);
+    setAllowanceUsed(false);
     setSubmittedDraft("");
     setCopied(false); setCopyError("");
     textareaRef.current?.focus();
@@ -202,7 +220,7 @@ export default function Rewriter({
         <div className="mb-5 flex items-start gap-3 rounded-2xl border border-success/25 bg-success-50 p-4 text-[0.9375rem] text-navy">
           <IconCheck className="mt-0.5 h-5 w-5 shrink-0 text-success" />
           <p>
-            Pro is active in this browser. Your rewrites are unlimited.
+            Pro is active in this browser. It includes {PRO_MONTHLY_REWRITES} rewrites a month.
           </p>
         </div>
       )}
@@ -216,7 +234,12 @@ export default function Rewriter({
             </p>
             {isPro && (
               <Pill tone="success">
-                <IconCheck className="h-3.5 w-3.5" /> Pro · unlimited rewrites
+                <IconCheck className="h-3.5 w-3.5" />
+                <span aria-live="polite" aria-atomic="true">
+                  {allowance
+                    ? `Pro · ${allowance.remaining.toLocaleString("en-US")} of ${allowance.limit.toLocaleString("en-US")} rewrites left this month`
+                    : "Pro"}
+                </span>
               </Pill>
             )}
           </div>
@@ -460,7 +483,7 @@ export default function Rewriter({
                         Log in
                       </ButtonLink>
                     </div>
-                  ) : (
+                  ) : allowanceUsed ? null : (
                     <Button type="button" variant="secondary" onClick={handleSubmit} className="self-start">
                       Try again
                     </Button>
@@ -513,7 +536,7 @@ export default function Rewriter({
         {!isPro && (
           <div className="flex flex-col items-center gap-1 border-t border-line bg-white px-4 py-4 text-center sm:flex-row sm:justify-center sm:gap-2 sm:py-3.5">
             <p className="text-[0.875rem] text-muted">
-              Unlimited rewrites: <span className="font-semibold text-navy">$19/month</span>, cancel anytime.
+              Pro: {PRO_MONTHLY_REWRITES} rewrites a month for <span className="font-semibold text-navy">$19</span>, cancel anytime.
             </p>
             <Link
               href="/checkout"

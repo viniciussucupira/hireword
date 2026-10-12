@@ -23,7 +23,7 @@ export const HOME_FAQ: FaqItem[] = [
   },
   {
     q: "What does it cost?",
-    a: "Hireword Pro is US$19 a month, with unlimited rewrites. Cancel on our Access & billing page and keep access until the end of your paid month. Try one free rewrite a day without an email or card. Each browser has its own free allowance, resetting at midnight UTC. Failed rewrites do not use it.",
+    a: "Hireword Pro is US$19 a month and includes 600 rewrites per calendar month (UTC), renewing on the 1st. Long texts can count as more than one rewrite; the editor shows what is left after each one. Cancel on our Access & billing page and keep access until the end of your paid month. Try one free rewrite a day without an email or card. Each browser has its own free allowance, resetting at midnight UTC. Failed rewrites do not use it. On a very busy day, free rewrites can pause until midnight UTC.",
   },
   {
     q: "Which English does it write — American or British?",

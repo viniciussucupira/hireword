@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { PRO_COOKIE_NAME, readProSessionDetails, sessionSecret } from "./pro-cookie";
-import { isPro as isProInRedis, signedOutAt } from "./redis";
+import { getProRecord, signedOutAt } from "./redis";
 import { refreshMonthlyPro } from "./paddle";
 
 /** A session is live unless its address signed out everywhere after it was issued. */
@@ -17,7 +17,7 @@ export async function sessionIsLive(session: { email: string; issuedAt: number }
  * `signedOut` means the cookie is genuine but was ended by "Sign out on all
  * devices"; the caller should clear it.
  */
-export async function getProStatus(): Promise<{ pro: boolean; email: string | null; needsRestore?: boolean; signedOut?: boolean }> {
+export async function getProStatus(): Promise<{ pro: boolean; email: string | null; lifetime?: boolean; needsRestore?: boolean; signedOut?: boolean }> {
   const cookieStore = await cookies();
   const raw = cookieStore.get(PRO_COOKIE_NAME)?.value;
   if (!raw) return { pro: false, email: null };
@@ -27,7 +27,10 @@ export async function getProStatus(): Promise<{ pro: boolean; email: string | nu
   if (!await sessionIsLive(session)) return { pro: false, email: null, signedOut: true };
   const { email } = session;
 
-  let pro = await isProInRedis(email);
+  const record = await getProRecord(email);
+  // A Lifetime purchase (no longer sold) keeps what it was sold: see the rewrite route.
+  if (record?.startsWith("lifetime:")) return { pro: true, email, lifetime: true };
+  let pro = Boolean(record);
   if (!pro) {
     // Monthly access lapsed in Redis: confirm with Paddle before locking out
     // a customer whose renewal simply hasn't been recorded yet.

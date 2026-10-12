@@ -13,9 +13,9 @@ export const MONTHLY_PLAN: Plan = {
   name: "Monthly Pro",
   price: "$19",
   cadence: "USD per month",
-  summary: "Unlimited rewrites while you are actively job hunting.",
+  summary: "600 rewrites a month while you are actively job hunting.",
   features: [
-    "Unlimited rewrites, every day",
+    "600 rewrites a month, renewing on the 1st (UTC)",
     "All four document types",
     "American or British English",
     "Compare numeric expressions with your draft",

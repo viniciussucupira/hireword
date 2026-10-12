@@ -65,7 +65,10 @@ const sections: LegalSection[] = [
         internet connection. Daily allowance records expire within 48 hours. Hashed IP counters used separately
         to prevent automated abuse expire after one hour. We also record token counts and estimated AI costs,
         separated into free and paid usage. Daily totals and monthly pseudonymous paid-usage totals are kept
-        for up to 400 days. These records do not contain your drafts or rewritten text.
+        for up to 400 days. To count Pro&apos;s monthly allowance, we keep the month&apos;s estimated AI cost for each Pro
+        account under a keyed hash of its email address, deleted after 40 days, and one shared daily total for all
+        free use, deleted after three days. When Paddle reports a renewal payment as past due, we keep a mark under
+        a hash of the email address for at most four days. These records do not contain your drafts or rewritten text.
       </p>
     ),
   },

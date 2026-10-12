@@ -75,7 +75,7 @@ export default function ToolLanding({ page }: { page: ToolPage }) {
               </ButtonLink>
             </div>
             <p className="text-[0.875rem] text-muted">
-              One free rewrite a day. No email or card. Unlimited is $19/month, cancel anytime.
+              One free rewrite a day. No email or card. Pro is 600 rewrites a month for $19, cancel anytime.
             </p>
           </div>
         </Container>

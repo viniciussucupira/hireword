@@ -84,8 +84,8 @@ export const TOOL_PAGES: Record<string, ToolPage> = {
     },
     faq: [
       {
-        q: "Should I write the cover letter in my own language first?",
-        a: "Write it in English, in your own words. Hireword works from your own sentences, so the result still sounds like you.",
+        q: "Should I start from a rough draft?",
+        a: "Yes. Write it in English, in your own words, even if it is rough. Hireword works from your own sentences, so the result still sounds like you.",
       },
       {
         q: "Will it make my cover letter longer?",
